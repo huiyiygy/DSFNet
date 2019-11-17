@@ -9,21 +9,9 @@ import math
 import torch
 import torch.nn as nn
 
-from model.flops_counter import get_flops_and_params
-
-
-def channel_split(x):
-    _, num_channels, _, _ = x.data.size()
-    channels_per_group = num_channels // 2
-    x1 = x[:, :channels_per_group, :, :].contiguous()
-    x2 = x[:, channels_per_group:, :, :].contiguous()
-
-    return x1, x2
-
 
 def channel_shuffle(x, groups):
     batchsize, num_channels, height, width = x.data.size()
-    assert num_channels % groups == 0
 
     # reshape
     x = x.view(batchsize, groups, num_channels // groups, height, width)
@@ -67,12 +55,13 @@ class DSFBlock(nn.Module):
         self.branch2 = DSFConv(inplanes // 2, outplanes // 2, stride, dilation, BatchNorm)
 
     def forward(self, x):
-        x1, x2 = channel_split(x)
+        x1, x2 = x.chunk(chunks=2, dim=1)  # 分块拆分
 
         x1 = self.branch1(x1)
         x2 = self.branch2(x2)
-        x = torch.cat((x1, x2), 1)
-        x = channel_shuffle(x, 2)
+
+        x = torch.cat((x1, x2), 1)  # 分块合并
+        x = channel_shuffle(x, 2)  # 分块Shuffle
 
         return x
 
@@ -248,5 +237,11 @@ if __name__ == "__main__":
     output = model(inputs)
     print(output.size())
 
+    # visualize the architecture of AlignedXception
+    # from torch.utils.tensorboard import SummaryWriter
+    # with SummaryWriter('../../checkpoint', comment='AlignedXception') as w:
+    #     w.add_graph(model, inputs)
+
     # (3, 1025, 513) FLOPs: 2.28 GMac Params: 493.95 k
-    get_flops_and_params(AlignedXception)
+    # from model.flops_counter import get_flops_and_params
+    # get_flops_and_params(AlignedXception)
