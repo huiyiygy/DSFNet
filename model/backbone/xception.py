@@ -135,19 +135,19 @@ class XceptionBlock(nn.Module):
 
 class AlignedXception(nn.Module):
     """
-    Alighed Xception
+    Modified Alighed Xception
     """
     def __init__(self, output_stride=16, BatchNorm=nn.BatchNorm2d):
         super(AlignedXception, self).__init__()
 
         if output_stride == 16:
             entry_block3_stride = 2
-            middle_block_dilation = 1
-            exit_block_dilations = (1, 2)
+            middle_block_dilation = [1, 1, 1]
+            exit_block_dilations = [1, 5, 7, 9]
         elif output_stride == 8:
             entry_block3_stride = 1
-            middle_block_dilation = 2
-            exit_block_dilations = (2, 4)
+            middle_block_dilation = [5, 7, 9]
+            exit_block_dilations = [2, 5, 7, 9]
         else:
             raise NotImplementedError
 
@@ -160,29 +160,29 @@ class AlignedXception(nn.Module):
         self.bn2 = BatchNorm(32)
 
         self.block1 = XceptionBlock(32, 64, reps=2, stride=2, BatchNorm=BatchNorm, start_with_relu=False)
-        self.block2 = XceptionBlock(64, 64, reps=2, stride=2, BatchNorm=BatchNorm, start_with_relu=False, grow_first=True)
-        self.block3 = XceptionBlock(64, 128, reps=2, stride=entry_block3_stride, BatchNorm=BatchNorm, start_with_relu=True, grow_first=True, is_last=True)
+        self.block2 = XceptionBlock(64, 64, reps=2, stride=2, BatchNorm=BatchNorm, start_with_relu=False)
+        self.block3 = XceptionBlock(64, 128, reps=2, stride=entry_block3_stride, BatchNorm=BatchNorm, is_last=True)
 
         # Middle flow
-        self.block4 = XceptionBlock(128, 128, reps=3, stride=1, dilation=middle_block_dilation, BatchNorm=BatchNorm, start_with_relu=True, grow_first=True)
-        self.block5 = XceptionBlock(128, 128, reps=3, stride=1, dilation=middle_block_dilation, BatchNorm=BatchNorm, start_with_relu=True, grow_first=True)
-        self.block6 = XceptionBlock(128, 128, reps=3, stride=1, dilation=middle_block_dilation, BatchNorm=BatchNorm, start_with_relu=True, grow_first=True)
-        self.block7 = XceptionBlock(128, 128, reps=3, stride=1, dilation=middle_block_dilation, BatchNorm=BatchNorm, start_with_relu=True, grow_first=True)
-        self.block8 = XceptionBlock(128, 128, reps=3, stride=1, dilation=middle_block_dilation, BatchNorm=BatchNorm, start_with_relu=True, grow_first=True)
-        self.block9 = XceptionBlock(128, 128, reps=3, stride=1, dilation=middle_block_dilation, BatchNorm=BatchNorm, start_with_relu=True, grow_first=True)
-        self.block10 = XceptionBlock(128, 128, reps=3, stride=1, dilation=middle_block_dilation, BatchNorm=BatchNorm, start_with_relu=True, grow_first=True)
-        self.block11 = XceptionBlock(128, 128, reps=3, stride=1, dilation=middle_block_dilation, BatchNorm=BatchNorm, start_with_relu=True, grow_first=True)
+        self.block4 = XceptionBlock(128, 128, reps=3, stride=1, dilation=middle_block_dilation[0], BatchNorm=BatchNorm)
+        self.block5 = XceptionBlock(128, 128, reps=3, stride=1, dilation=middle_block_dilation[1], BatchNorm=BatchNorm)
+        self.block6 = XceptionBlock(128, 128, reps=3, stride=1, dilation=middle_block_dilation[2], BatchNorm=BatchNorm)
+        self.block7 = XceptionBlock(128, 128, reps=3, stride=1, dilation=middle_block_dilation[0], BatchNorm=BatchNorm)
+        self.block8 = XceptionBlock(128, 128, reps=3, stride=1, dilation=middle_block_dilation[1], BatchNorm=BatchNorm)
+        self.block9 = XceptionBlock(128, 128, reps=3, stride=1, dilation=middle_block_dilation[2], BatchNorm=BatchNorm)
+        self.block10 = XceptionBlock(128, 128, reps=3, stride=1, dilation=middle_block_dilation[0], BatchNorm=BatchNorm)
+        self.block11 = XceptionBlock(128, 128, reps=3, stride=1, dilation=middle_block_dilation[1], BatchNorm=BatchNorm)
 
         # Exit flow
-        self.block12 = XceptionBlock(128, 256, reps=2, stride=1, dilation=exit_block_dilations[0], BatchNorm=BatchNorm, start_with_relu=True, grow_first=False, is_last=True)
+        self.block12 = XceptionBlock(128, 256, reps=2, stride=1, dilation=exit_block_dilations[0], BatchNorm=BatchNorm, grow_first=False, is_last=True)
 
         self.conv3 = DSFBlock(256, 256, dilation=exit_block_dilations[1], BatchNorm=BatchNorm)
         self.bn3 = BatchNorm(256)
 
-        self.conv4 = DSFBlock(256, 256, dilation=exit_block_dilations[1], BatchNorm=BatchNorm)
+        self.conv4 = DSFBlock(256, 256, dilation=exit_block_dilations[2], BatchNorm=BatchNorm)
         self.bn4 = BatchNorm(256)
 
-        self.conv5 = DSFBlock(256, 256, dilation=exit_block_dilations[1], BatchNorm=BatchNorm)
+        self.conv5 = DSFBlock(256, 256, dilation=exit_block_dilations[3], BatchNorm=BatchNorm)
         self.bn5 = BatchNorm(256)
 
         # Init weights
@@ -243,10 +243,10 @@ class AlignedXception(nn.Module):
 
 
 if __name__ == "__main__":
-    model = AlignedXception(output_stride=16, BatchNorm=nn.BatchNorm2d)
+    model = AlignedXception(output_stride=8, BatchNorm=nn.BatchNorm2d)
     inputs = torch.rand(1, 3, 1025, 513)
     output = model(inputs)
     print(output.size())
 
-    # (3, 513, 513) FLOPs: 1.15 GMac Params: 493.95 k
+    # (3, 1025, 513) FLOPs: 2.28 GMac Params: 493.95 k
     get_flops_and_params(AlignedXception)
