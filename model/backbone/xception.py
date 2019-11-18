@@ -126,8 +126,19 @@ class AlignedXception(nn.Module):
     """
     Modified Alighed Xception
     """
-    def __init__(self, output_stride=16, BatchNorm=nn.BatchNorm2d):
+    def __init__(self, output_stride=16, BatchNorm=nn.BatchNorm2d, is_native=False):
+        """
+        Inputs:
+        -------
+        - output_stride: 8 or 16
+        - BatchNorm: nn.SyncBatchNorm or nn.BatchNorm2d
+        - is_native:
+            为True时，编码模块需返回中间下采样1/4的特征图，解码模块直接上采样。
+            为False时，编码模块只返回x, 解码模块添加注意力分支。
+        """
         super(AlignedXception, self).__init__()
+
+        self.is_native = is_native
 
         if output_stride == 16:
             entry_block3_stride = 2
@@ -149,7 +160,10 @@ class AlignedXception(nn.Module):
         self.bn2 = BatchNorm(32)
 
         self.block1 = XceptionBlock(32, 64, reps=2, stride=2, BatchNorm=BatchNorm, start_with_relu=False)
-        self.block2 = XceptionBlock(64, 64, reps=2, stride=2, BatchNorm=BatchNorm, start_with_relu=False)
+        if self.is_native:
+            self.block2 = XceptionBlock(64, 64, reps=2, stride=2, BatchNorm=BatchNorm, start_with_relu=False)
+        else:
+            self.block2 = XceptionBlock(64, 64, reps=2, stride=2, BatchNorm=BatchNorm, start_with_relu=True)
         self.block3 = XceptionBlock(64, 128, reps=2, stride=entry_block3_stride, BatchNorm=BatchNorm, is_last=True)
 
         # Middle flow
@@ -188,6 +202,11 @@ class AlignedXception(nn.Module):
         x = self.relu(x)
 
         x = self.block1(x)
+        low_level_feature = None
+        if self.is_native:
+            # add relu here
+            x = self.relu(x)
+            low_level_feature = x
         x = self.block2(x)
         x = self.block3(x)
 
@@ -216,13 +235,15 @@ class AlignedXception(nn.Module):
         x = self.bn5(x)
         x = self.relu(x)
 
-        return x
+        if self.is_native:
+            return x, low_level_feature
+        else:
+            return x
 
     def _init_weight(self):
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
-                n = m.kernel_size[0] * m.kernel_size[1] * m.out_channels
-                m.weight.data.normal_(0, math.sqrt(2. / n))
+                torch.nn.init.kaiming_normal_(m.weight)
             elif isinstance(m, nn.SyncBatchNorm):
                 m.weight.data.fill_(1)
                 m.bias.data.zero_()
@@ -232,10 +253,11 @@ class AlignedXception(nn.Module):
 
 
 if __name__ == "__main__":
-    model = AlignedXception(output_stride=8, BatchNorm=nn.BatchNorm2d)
+    model = AlignedXception(output_stride=16, BatchNorm=nn.BatchNorm2d, is_native=True)
     inputs = torch.rand(1, 3, 1025, 513)
-    output = model(inputs)
-    print(output.size())
+    output, low_level_feat = model(inputs)
+    print(output.size())  # [1, 256, 65, 33]
+    print(low_level_feat.size())  # [1, 64, 257, 129]
 
     # visualize the architecture of AlignedXception
     # from torch.utils.tensorboard import SummaryWriter
@@ -243,5 +265,5 @@ if __name__ == "__main__":
     #     w.add_graph(model, inputs)
 
     # (3, 1025, 513) FLOPs: 2.28 GMac Params: 493.95 k
-    # from model.flops_counter import get_flops_and_params
+    # from utils.flops_counter import get_flops_and_params
     # get_flops_and_params(AlignedXception)
