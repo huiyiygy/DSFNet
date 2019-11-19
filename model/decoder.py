@@ -10,6 +10,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from model.backbone.xception import DSFBlock
+from model.sync_batchnorm import SynchronizedBatchNorm2d
 
 
 class DSFConvBnRelu(nn.Module):
@@ -53,7 +54,7 @@ class NativeDecoder(nn.Module):
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
                 torch.nn.init.kaiming_normal_(m.weight)
-            elif isinstance(m, nn.SyncBatchNorm):
+            elif isinstance(m, SynchronizedBatchNorm2d):
                 m.weight.data.fill_(1)
                 m.bias.data.zero_()
             elif isinstance(m, nn.BatchNorm2d):

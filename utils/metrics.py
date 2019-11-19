@@ -16,9 +16,8 @@ class Evaluator(object):
 
     def pixel_accuracy_class(self):
         pac = np.diag(self.confusion_matrix) / self.confusion_matrix.sum(axis=1)
-        pac_list = np.nanmean(pac, axis=1)  # 按每个类别求平均
         mpac = np.nanmean(pac)  # 所有求平均
-        return mpac, pac_list
+        return mpac
 
     def mean_intersection_over_union(self):
         MIoU = np.diag(self.confusion_matrix) / (

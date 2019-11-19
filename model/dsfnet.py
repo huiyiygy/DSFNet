@@ -11,6 +11,7 @@ import torch.nn.functional as F
 
 from model.backbone.xception import AlignedXception
 from model.decoder import build_decoder
+from model.sync_batchnorm import SynchronizedBatchNorm2d
 
 
 class DSFNet(nn.Module):
@@ -30,7 +31,7 @@ class DSFNet(nn.Module):
         self.is_native = is_native
         BatchNorm = None
         if sync_bn:
-            BatchNorm = nn.SyncBatchNorm  # 用于多卡训练的BN
+            BatchNorm = SynchronizedBatchNorm2d  # 用于多卡训练的BN
         else:
             BatchNorm = nn.BatchNorm2d
 

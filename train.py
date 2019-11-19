@@ -14,6 +14,7 @@ from tqdm import tqdm
 
 from dataloader import make_data_loader
 from model.dsfnet import DSFNet
+from model.sync_batchnorm.replicate import patch_replication_callback
 from utils.loss import SegmentationLosses
 from utils.saver import Saver
 from utils.metrics import Evaluator
@@ -51,11 +52,11 @@ class Trainer(object):
 
         # Define lr scheduler
         if self.args.lr_scheduler == 'plateau':
-            self.scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(self.optimizer, factor=0.3, min_lr=1e-8)
+            self.scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(self.optimizer,  mode='max', factor=0.3, min_lr=1e-8)
         elif self.args.lr_scheduler == 'step':
             self.scheduler = torch.optim.lr_scheduler.StepLR(self.optimizer, step_size=10, gamma=0.9)
         elif self.args.lr_scheduler == 'cos':
-            self.scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(self.optimizer, T_max=10, eta_min=1e-8)
+            self.scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(self.optimizer, T_max=self.args.epochs, eta_min=1e-8)
         else:
             raise NotImplementedError
 
@@ -68,6 +69,7 @@ class Trainer(object):
         # Using cuda
         if args.cuda:
             self.model = torch.nn.DataParallel(self.model, device_ids=self.args.gpu_ids)
+            patch_replication_callback(self.model)
             self.model = self.model.cuda()
             # 提升Pytorch运行效率
             torch.backends.cudnn.enabled = True
@@ -91,7 +93,7 @@ class Trainer(object):
             print("=> loaded checkpoint '{}' (epoch {})".format(args.resume, checkpoint['epoch']))
 
     def training(self, epoch):
-        print('[Epoch: %d, learning rate: %.8f, previous best = %.6f]' % (epoch, self.scheduler.get_lr(), self.best_pred))
+        print('[Epoch: %d, previous best = %.6f]' % (epoch+1, self.best_pred))
         train_loss = 0.0
         self.model.train()
         self.evaluator.reset()
@@ -114,8 +116,6 @@ class Trainer(object):
             tbar.set_description('Train loss: %.6f' % (train_loss / (i + 1)))
             self.writer.add_scalar('train/total_loss_iter', loss.item(), i + num_img_tr * epoch)
 
-        self.scheduler.step()
-
         # 训练时只计算每个epoch最后一次迭代的准确率，因为训练集数据多，如果统计所有就太慢了。
         pred = output.data.cpu().numpy()
         target = target.cpu().numpy()
@@ -133,6 +133,10 @@ class Trainer(object):
         self.writer.add_scalar('train/mean_class_pixel_accuracy', mean_class_pixel_accuracy, epoch)
         self.writer.add_scalar('train/fwIoU', FWIoU, epoch)
         self.writer.add_scalar('train/total_loss_epoch', train_loss, epoch)
+
+        # update learning rate per epoch for step / cos mode
+        if self.args.lr_scheduler != 'plateau':
+            self.scheduler.step(epoch=epoch)
 
         print('train validation:')
         print("pixel_acc:{}, mean_class_pixel_acc:{}, mIoU:{}, fwIoU: {}".format(pixel_accuracy, mean_class_pixel_accuracy, mIoU, FWIoU))
@@ -154,7 +158,7 @@ class Trainer(object):
                 output = self.model(image)
             loss = self.criterion(output, target)
             test_loss += loss.item()
-            tbar.set_description('Test loss: %.5f' % (test_loss / (i + 1)))
+            tbar.set_description('Test loss: %.6f' % (test_loss / (i + 1)))
             self.writer.add_scalar('val/total_loss_iter', loss.item(), i + num_img_val * epoch)
             pred = output.data.cpu().numpy()
             target = target.cpu().numpy()
@@ -176,6 +180,10 @@ class Trainer(object):
         print("pixel_acc:{}, mean_class_pixel_acc:{}, mIoU:{}, fwIoU: {}".format(pixel_accuracy, mean_class_pixel_accuracy, mIoU, FWIoU))
         print('Loss: %.6f' % test_loss)
         print('====================================')
+
+        # update learning rate per epoch for plateau mode
+        if self.args.lr_scheduler == 'plateau':
+            self.scheduler.step(metrics=mIoU, epoch=epoch)
 
         new_pred = mIoU
         if new_pred > self.best_pred:
@@ -200,11 +208,11 @@ def main():
     parser.add_argument('--workers', type=int, default=4, metavar='N', help='dataloader threads')
     parser.add_argument('--base-size', type=int, default=513, help='base image size')
     parser.add_argument('--crop-size', type=int, default=513, help='crop image size')
-    parser.add_argument('--sync-bn', type=bool, action='store_true', default=False,
-                        help='whether to use sync bn (default: auto)')
+    parser.add_argument('--sync-bn', action='store_true', default=False,
+                        help='whether to use sync bn (default: False)')
     parser.add_argument('--loss-type', type=str, default='ce',
                         choices=['ce', 'focal'], help='loss func type (default: ce)')
-    parser.add_argument('--is-native', type=bool, action='store_true', default=False,
+    parser.add_argument('--is-native', action='store_true', default=False,
                         help='whether to use native DSFNet')
     # training hyper params
     parser.add_argument('--epochs', type=int, default=None, metavar='N',
