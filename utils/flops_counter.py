@@ -9,7 +9,7 @@ import torch
 from ptflops import get_model_complexity_info
 
 
-def get_flops_and_params(model_def, input_shape=(3, 1025, 513)):
+def get_flops_and_params(model_def, input_shape=(3, 512, 512)):
     with torch.cuda.device(0):
         net = model_def()
         flops, params = get_model_complexity_info(net, input_shape, as_strings=True, print_per_layer_stat=True)

@@ -12,9 +12,11 @@ from torch.utils.tensorboard import SummaryWriter
 import numpy as np
 from tqdm import tqdm
 
+from mypath import Path
 from dataloader import make_data_loader
 from model.dsfnet import DSFNet
 from model.sync_batchnorm.replicate import patch_replication_callback
+from utils.calculate_weights import calculate_weigths_labels
 from utils.loss import SegmentationLosses
 from utils.saver import Saver
 from utils.metrics import Evaluator
@@ -61,7 +63,17 @@ class Trainer(object):
             raise NotImplementedError
 
         # Define Criterion
-        self.criterion = SegmentationLosses(cuda=args.cuda).build_loss(mode=args.loss_type)
+        # whether to use class balanced weights
+        if args.use_balanced_weights:
+            classes_weights_path = os.path.join(Path.db_root_dir(args.dataset), args.dataset+'_classes_weights.npy')
+            if os.path.isfile(classes_weights_path):
+                weight = np.load(classes_weights_path)
+            else:
+                weight = calculate_weigths_labels(args.dataset, self.train_loader, self.nclass)
+            weight = torch.from_numpy(weight.astype(np.float32))
+        else:
+            weight = None
+        self.criterion = SegmentationLosses(weight=weight, cuda=args.cuda).build_loss(mode=args.loss_type)
 
         # Define Evaluator
         self.evaluator = Evaluator(self.nclass)
@@ -206,8 +218,8 @@ def main():
     parser.add_argument('--dataset', type=str, default='cityscapes',
                         choices=['cityscapes'], help='dataset name (default: cityscapes)')
     parser.add_argument('--workers', type=int, default=4, metavar='N', help='dataloader threads')
-    parser.add_argument('--base-size', type=int, default=513, help='base image size')
-    parser.add_argument('--crop-size', type=int, default=513, help='crop image size')
+    parser.add_argument('--base-size', type=int, default=512, help='base image size')
+    parser.add_argument('--crop-size', type=int, default=512, help='crop image size')
     parser.add_argument('--sync-bn', action='store_true', default=False,
                         help='whether to use sync bn (default: False)')
     parser.add_argument('--loss-type', type=str, default='ce',
@@ -221,6 +233,8 @@ def main():
                         metavar='N', help='start epochs (default:0)')
     parser.add_argument('--batch-size', type=int, default=None,
                         metavar='N', help='input batch size for training (default: auto)')
+    parser.add_argument('--use-balanced-weights', action='store_true', default=False,
+                        help='whether to use balanced weights (default: False)')
     # optimizer params
     parser.add_argument('--optim', type=str, default='adam',
                         choices=['sgd', 'adam'], help='Optimizer: (default: adam)')
