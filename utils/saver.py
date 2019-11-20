@@ -51,15 +51,15 @@ class Saver(object):
         p['lr'] = self.args.lr
         p['lr_scheduler'] = self.args.lr_scheduler
         p['weight_decay'] = self.args.weight_decay
-        p['sync_bn'] = 1 if self.args.sync_bn else 0
-        p['is_native'] = 1 if self.args.is_native else 0
+        p['sync_bn'] = 'True' if self.args.sync_bn else 'False'
+        p['use_attention'] = 'True' if self.args.use_attention else 'False'
+        p['use_balanced_weights'] = 'True' if self.args.use_balanced_weights else 'False'
         p['loss_type'] = self.args.loss_type
         p['epoch'] = self.args.epochs
         p['base_size'] = self.args.base_size
         p['crop_size'] = self.args.crop_size
         p['out_stride'] = self.args.out_stride
         p['optimizer'] = self.args.optim
-
 
         for key, val in p.items():
             log_file.write(key + ':' + str(val) + '\n')
