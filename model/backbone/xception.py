@@ -128,19 +128,14 @@ class AlignedXception(nn.Module):
     """
     Modified Alighed Xception
     """
-    def __init__(self, output_stride=16, BatchNorm=nn.BatchNorm2d, is_native=False):
+    def __init__(self, output_stride=16, BatchNorm=nn.BatchNorm2d):
         """
         Inputs:
         -------
         - output_stride: 8 or 16
         - BatchNorm: nn.SyncBatchNorm or nn.BatchNorm2d
-        - is_native:
-            为True时，编码模块需返回中间下采样1/4的特征图，解码模块直接上采样。
-            为False时，编码模块只返回x, 解码模块添加注意力分支。
         """
         super(AlignedXception, self).__init__()
-
-        self.is_native = is_native
 
         if output_stride == 16:
             entry_block3_stride = 2
@@ -162,10 +157,7 @@ class AlignedXception(nn.Module):
         self.bn2 = BatchNorm(32)
 
         self.block1 = XceptionBlock(32, 64, reps=2, stride=2, BatchNorm=BatchNorm, start_with_relu=False)
-        if self.is_native:
-            self.block2 = XceptionBlock(64, 64, reps=2, stride=2, BatchNorm=BatchNorm, start_with_relu=False)
-        else:
-            self.block2 = XceptionBlock(64, 64, reps=2, stride=2, BatchNorm=BatchNorm, start_with_relu=True)
+        self.block2 = XceptionBlock(64, 64, reps=2, stride=2, BatchNorm=BatchNorm, start_with_relu=False)
         self.block3 = XceptionBlock(64, 128, reps=2, stride=entry_block3_stride, BatchNorm=BatchNorm, is_last=True)
 
         # Middle flow
@@ -204,11 +196,9 @@ class AlignedXception(nn.Module):
         x = self.relu(x)
 
         x = self.block1(x)
-        low_level_feature = None
-        if self.is_native:
-            # add relu here
-            x = self.relu(x)
-            low_level_feature = x
+        # add relu here
+        x = self.relu(x)
+        low_level_feature = x
         x = self.block2(x)
         x = self.block3(x)
 
@@ -237,10 +227,7 @@ class AlignedXception(nn.Module):
         x = self.bn5(x)
         x = self.relu(x)
 
-        if self.is_native:
-            return x, low_level_feature
-        else:
-            return x
+        return x, low_level_feature
 
     def _init_weight(self):
         for m in self.modules():
@@ -252,7 +239,7 @@ class AlignedXception(nn.Module):
 
 
 if __name__ == "__main__":
-    model = AlignedXception(output_stride=16, BatchNorm=nn.BatchNorm2d, is_native=True)
+    model = AlignedXception(output_stride=16, BatchNorm=nn.BatchNorm2d)
     inputs = torch.rand(1, 3, 512, 512)
     output, low_level_feat = model(inputs)
     print(output.size())  # [1, 256, 32, 32]

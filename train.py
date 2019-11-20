@@ -40,7 +40,7 @@ class Trainer(object):
         self.model = DSFNet(num_classes=self.nclass,
                             output_stride=args.out_stride,
                             sync_bn=args.sync_bn,
-                            is_native=args.is_native
+                            use_attention=args.use_attention
                             )
 
         # Define Optimizer
@@ -54,7 +54,7 @@ class Trainer(object):
 
         # Define lr scheduler
         if self.args.lr_scheduler == 'plateau':
-            self.scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(self.optimizer,  mode='max', factor=0.3, min_lr=1e-8)
+            self.scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(self.optimizer,  mode='max', factor=0.3, verbose=True, min_lr=1e-8)
         elif self.args.lr_scheduler == 'step':
             self.scheduler = torch.optim.lr_scheduler.StepLR(self.optimizer, step_size=10, gamma=0.9)
         elif self.args.lr_scheduler == 'cos':
@@ -224,8 +224,6 @@ def main():
                         help='whether to use sync bn (default: False)')
     parser.add_argument('--loss-type', type=str, default='ce',
                         choices=['ce', 'focal'], help='loss func type (default: ce)')
-    parser.add_argument('--is-native', action='store_true', default=False,
-                        help='whether to use native DSFNet')
     # training hyper params
     parser.add_argument('--epochs', type=int, default=None, metavar='N',
                         help='number of epochs to train (default: auto)')
@@ -235,6 +233,8 @@ def main():
                         metavar='N', help='input batch size for training (default: auto)')
     parser.add_argument('--use-balanced-weights', action='store_true', default=False,
                         help='whether to use balanced weights (default: False)')
+    parser.add_argument('--use-attention', action='store_true', default=False,
+                        help='whether to use attention (default: False)')
     # optimizer params
     parser.add_argument('--optim', type=str, default='adam',
                         choices=['sgd', 'adam'], help='Optimizer: (default: adam)')

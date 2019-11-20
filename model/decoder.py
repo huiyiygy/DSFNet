@@ -64,14 +64,16 @@ class RAN(nn.Module):
     """
 
 
-
 class AttentionDecoder(nn.Module):
-    pass
+    def __init__(self, num_classes, BatchNorm):
+        super(AttentionDecoder, self).__init__()
+
+    def forward(self, x, low_level_feat):
+        pass
 
 
-
-
-
-def build_decoder(num_classes, BatchNorm, is_native):
-    if is_native:
-        return NativeDecoder(num_classes,  BatchNorm)
+def build_decoder(num_classes, BatchNorm, use_attention):
+    if not use_attention:
+        return NativeDecoder(num_classes, BatchNorm)
+    else:
+        return AttentionDecoder(num_classes, BatchNorm)
