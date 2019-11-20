@@ -58,7 +58,6 @@ if __name__ == "__main__":
     print(output.size())
 
     # (3, 512, 512)
-    # output_stride=16, is_native=True FLOPs: 5.13 GMac Params: 579.35 k
-    # half channels  Flops:  0.74 GMac Params: 163.36 k
+    # output_stride=16, is_native=True FLOPs: 2.52 GMac Params: 579.35 k
     # from utils.flops_counter import get_flops_and_params
     # get_flops_and_params(DSFNet)

@@ -34,11 +34,11 @@ class NativeDecoder(nn.Module):
     """
     def __init__(self, num_classes, BatchNorm):
         super(NativeDecoder, self).__init__()
-        # 32 + 128 = 160 low_level_feat: 32  x: 128
-        self.last_conv = nn.Sequential(DSFConvBnRelu(160, 128, BatchNorm=BatchNorm),
-                                       DSFConvBnRelu(128, 128, BatchNorm=BatchNorm),
+        # 64 + 256 = 320 low_level_feat: 64  x: 256
+        self.last_conv = nn.Sequential(DSFConvBnRelu(320, 256, BatchNorm=BatchNorm),
+                                       DSFConvBnRelu(256, 256, BatchNorm=BatchNorm),
                                        nn.Dropout(0.5),
-                                       nn.Conv2d(128, num_classes, kernel_size=1, stride=1)
+                                       nn.Conv2d(256, num_classes, kernel_size=1, stride=1)
                                        )
         self._init_weight()
 
