@@ -69,11 +69,11 @@ class CityscapesSegmentation(data.Dataset):
             return self.transform_test(sample)
 
     def encode_segmap(self, mask):
-        # Put all void classes to zero
-        for _voidc in self.void_classes:
-            mask[mask == _voidc] = self.ignore_index
-        for _validc in self.valid_classes:
-            mask[mask == _validc] = self.class_map[_validc]
+        # Put all void classes to ignore index
+        for _void_class in self.void_classes:
+            mask[mask == _void_class] = self.ignore_index
+        for _valid_class in self.valid_classes:
+            mask[mask == _valid_class] = self.class_map[_valid_class]
         return mask
 
     @staticmethod

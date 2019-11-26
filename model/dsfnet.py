@@ -15,7 +15,7 @@ from model.sync_batchnorm import SynchronizedBatchNorm2d
 
 
 class DSFNet(nn.Module):
-    def __init__(self, output_stride=16, num_classes=19, sync_bn=False, use_attention=False):
+    def __init__(self, output_stride=16, num_classes=19, sync_bn=False, use_attention=False, use_dropout=False):
         """
         Inputs:
         -------
@@ -32,7 +32,7 @@ class DSFNet(nn.Module):
             BatchNorm = nn.BatchNorm2d
 
         self.encoder = AlignedXception(output_stride, BatchNorm)
-        self.decoder = build_decoder(num_classes, BatchNorm, use_attention)
+        self.decoder = build_decoder(num_classes, BatchNorm, use_attention, use_dropout)
 
     def forward(self, inputs):
         x, low_level_feat = self.encoder(inputs)
@@ -50,6 +50,7 @@ if __name__ == "__main__":
     print(output.size())
 
     # (3, 512, 512)
-    # output_stride=16, is_native=True FLOPs: 2.52 GMac Params: 579.35 k
+    # output_stride=16, use_attention=False, use_dropout=True FLOPs: 1.19 GMac Params: 503.17 k
+    # output_stride=16, use_attention=True,  use_dropout=True FLOPs: 1.19 GMac Params: 522.7 k
     # from utils.flops_counter import get_flops_and_params
     # get_flops_and_params(DSFNet)
