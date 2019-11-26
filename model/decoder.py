@@ -131,6 +131,7 @@ class AttentionDecoder(nn.Module):
                                            DSFConvBnRelu(num_classes * 2, num_classes * 2, BatchNorm=BatchNorm),
                                            nn.Conv2d(num_classes * 2, num_classes, kernel_size=1, stride=1)
                                            )
+        self._init_weight()
 
     def forward(self, x, low_level_feat):
         low_level_feat = self.low_level_feat_branch(low_level_feat)
@@ -150,6 +151,14 @@ class AttentionDecoder(nn.Module):
 
         x = self.last_conv(x)
         return x
+
+    def _init_weight(self):
+        for m in self.modules():
+            if isinstance(m, nn.Conv2d):
+                torch.nn.init.kaiming_normal_(m.weight)
+            elif isinstance(m, (nn.BatchNorm2d, SynchronizedBatchNorm2d)):
+                m.weight.data.fill_(1)
+                m.bias.data.zero_()
 
 
 def build_decoder(num_classes, BatchNorm, use_attention, use_dropout):
