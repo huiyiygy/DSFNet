@@ -43,7 +43,7 @@ class DSFNet(nn.Module):
 
 
 if __name__ == "__main__":
-    model = DSFNet(output_stride=16)
+    model = DSFNet(output_stride=16, use_attention=True)
     model.eval()
     inp = torch.rand(1, 3, 512, 512)
     output = model(inp)
