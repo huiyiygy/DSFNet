@@ -9,13 +9,13 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from model.backbone.xception import AlignedXception
+from model.backbone.xception import Xception
 from model.decoder import build_decoder
 from model.sync_batchnorm import SynchronizedBatchNorm2d
 
 
 class DSFNet(nn.Module):
-    def __init__(self, output_stride=16, num_classes=19, sync_bn=False, use_attention=False, use_dropout=False):
+    def __init__(self, output_stride=8, num_classes=19, sync_bn=False, use_attention=False):
         """
         Inputs:
         -------
@@ -31,8 +31,8 @@ class DSFNet(nn.Module):
         else:
             BatchNorm = nn.BatchNorm2d
 
-        self.encoder = AlignedXception(output_stride, BatchNorm)
-        self.decoder = build_decoder(num_classes, BatchNorm, use_attention, use_dropout)
+        self.encoder = Xception(output_stride, BatchNorm)
+        self.decoder = build_decoder(num_classes, BatchNorm, use_attention)
 
     def forward(self, inputs):
         x, low_level_feat = self.encoder(inputs)
@@ -50,7 +50,7 @@ if __name__ == "__main__":
     print(output.size())
 
     # (3, 512, 512)
-    # output_stride=16, use_attention=False, use_dropout=True FLOPs: 1.19 GMac Params: 503.17 k
-    # output_stride=16, use_attention=True,  use_dropout=True FLOPs: 1.19 GMac Params: 522.7 k
+    # output_stride=8, use_attention=False FLOPs: 2.62 GMac Params: 503.17 k
+    # output_stride=8, use_attention=True  FLOPs: 2.63 GMac Params: 522.7 k
     # from utils.flops_counter import get_flops_and_params
     # get_flops_and_params(DSFNet)

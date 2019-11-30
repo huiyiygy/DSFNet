@@ -124,18 +124,18 @@ class XceptionBlock(nn.Module):
         return x
 
 
-class AlignedXception(nn.Module):
+class Xception(nn.Module):
     """
-    Modified Alighed Xception
+    Xception
     """
-    def __init__(self, output_stride=16, BatchNorm=nn.BatchNorm2d):
+    def __init__(self, output_stride=8, BatchNorm=nn.BatchNorm2d):
         """
         Inputs:
         -------
         - output_stride: 8 or 16
         - BatchNorm: nn.SyncBatchNorm or nn.BatchNorm2d
         """
-        super(AlignedXception, self).__init__()
+        super(Xception, self).__init__()
 
         if output_stride == 16:
             entry_block3_stride = 2
@@ -239,10 +239,10 @@ class AlignedXception(nn.Module):
 
 
 if __name__ == "__main__":
-    model = AlignedXception(output_stride=16, BatchNorm=nn.BatchNorm2d)
+    model = Xception(output_stride=8, BatchNorm=nn.BatchNorm2d)
     inputs = torch.rand(1, 3, 512, 512)
     output, low_level_feat = model(inputs)
-    print(output.size())  # [1, 256, 32, 32]
+    print(output.size())  # [1, 256, 64, 64]
     print(low_level_feat.size())  # [1, 64, 128, 128]
 
     # visualize the architecture of AlignedXception
@@ -251,6 +251,6 @@ if __name__ == "__main__":
     #     w.add_graph(model, inputs)
 
     # (3, 512, 512)
-    # Flops:  1.11 GMac Params: 493.95 k
+    # output_stride=8 Flops:  2.53 GMac Params: 493.95 k
     # from utils.flops_counter import get_flops_and_params
-    # get_flops_and_params(AlignedXception)
+    # get_flops_and_params(Xception)

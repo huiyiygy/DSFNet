@@ -33,23 +33,16 @@ class NativeDecoder(nn.Module):
     编码器最后一层特征图上采样后与编码器中间下采样1/4的特征图融合，然后再次上采样
     """
 
-    def __init__(self, num_classes, BatchNorm, use_dropout):
+    def __init__(self, num_classes, BatchNorm):
         super(NativeDecoder, self).__init__()
 
         self.low_level_feat_branch = nn.Conv2d(64, num_classes, 1)
         self.conv = nn.Conv2d(256, num_classes, 1)
 
-        if use_dropout:
-            self.last_conv = nn.Sequential(DSFConvBnRelu(num_classes * 2, num_classes * 2, BatchNorm=BatchNorm),
-                                           DSFConvBnRelu(num_classes * 2, num_classes * 2, BatchNorm=BatchNorm),
-                                           nn.Dropout(0.5),
-                                           nn.Conv2d(num_classes * 2, num_classes, kernel_size=1, stride=1)
-                                           )
-        else:
-            self.last_conv = nn.Sequential(DSFConvBnRelu(num_classes * 2, num_classes * 2, BatchNorm=BatchNorm),
-                                           DSFConvBnRelu(num_classes * 2, num_classes * 2, BatchNorm=BatchNorm),
-                                           nn.Conv2d(num_classes * 2, num_classes, kernel_size=1, stride=1)
-                                           )
+        self.last_conv = nn.Sequential(DSFConvBnRelu(num_classes * 2, num_classes * 2, BatchNorm=BatchNorm),
+                                       DSFConvBnRelu(num_classes * 2, num_classes * 2, BatchNorm=BatchNorm),
+                                       nn.Conv2d(num_classes * 2, num_classes, kernel_size=1, stride=1)
+                                       )
         self._init_weight()
 
     def forward(self, x, low_level_feat):
@@ -108,7 +101,7 @@ class SpatialAttention(nn.Module):
 
 
 class AttentionDecoder(nn.Module):
-    def __init__(self, num_classes, BatchNorm, use_dropout):
+    def __init__(self, num_classes, BatchNorm):
         super(AttentionDecoder, self).__init__()
         self.low_level_feat_branch = nn.Conv2d(64, num_classes, 1)
         self.conv = nn.Conv2d(256, num_classes, 1)
@@ -120,17 +113,10 @@ class AttentionDecoder(nn.Module):
 
         self.spatial_attention_branch = SpatialAttention(256, num_classes)
 
-        if use_dropout:
-            self.last_conv = nn.Sequential(DSFConvBnRelu(num_classes * 2, num_classes * 2, BatchNorm=BatchNorm),
-                                           DSFConvBnRelu(num_classes * 2, num_classes * 2, BatchNorm=BatchNorm),
-                                           nn.Dropout(0.5),
-                                           nn.Conv2d(num_classes * 2, num_classes, kernel_size=1, stride=1)
-                                           )
-        else:
-            self.last_conv = nn.Sequential(DSFConvBnRelu(num_classes * 2, num_classes * 2, BatchNorm=BatchNorm),
-                                           DSFConvBnRelu(num_classes * 2, num_classes * 2, BatchNorm=BatchNorm),
-                                           nn.Conv2d(num_classes * 2, num_classes, kernel_size=1, stride=1)
-                                           )
+        self.last_conv = nn.Sequential(DSFConvBnRelu(num_classes * 2, num_classes * 2, BatchNorm=BatchNorm),
+                                       DSFConvBnRelu(num_classes * 2, num_classes * 2, BatchNorm=BatchNorm),
+                                       nn.Conv2d(num_classes * 2, num_classes, kernel_size=1, stride=1)
+                                       )
         self._init_weight()
 
     def forward(self, x, low_level_feat):
@@ -161,8 +147,8 @@ class AttentionDecoder(nn.Module):
                 m.bias.data.zero_()
 
 
-def build_decoder(num_classes, BatchNorm, use_attention, use_dropout):
+def build_decoder(num_classes, BatchNorm, use_attention):
     if not use_attention:
-        return NativeDecoder(num_classes, BatchNorm, use_dropout)
+        return NativeDecoder(num_classes, BatchNorm)
     else:
-        return AttentionDecoder(num_classes, BatchNorm, use_dropout)
+        return AttentionDecoder(num_classes, BatchNorm)

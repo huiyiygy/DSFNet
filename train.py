@@ -40,8 +40,7 @@ class Trainer(object):
         self.model = DSFNet(num_classes=self.nclass,
                             output_stride=args.out_stride,
                             sync_bn=args.sync_bn,
-                            use_attention=args.use_attention,
-                            use_dropout=args.use_dropout
+                            use_attention=args.use_attention
                             )
 
         # Define Optimizer
@@ -236,8 +235,6 @@ def main():
                         help='whether to use balanced weights (default: False)')
     parser.add_argument('--use-attention', action='store_true', default=False,
                         help='whether to use attention (default: False)')
-    parser.add_argument('--use-dropout', action='store_true', default=False,
-                        help='whether to use dropout (default: False)')
     # optimizer params
     parser.add_argument('--optim', type=str, default='adam',
                         choices=['sgd', 'adam'], help='Optimizer: (default: adam)')
