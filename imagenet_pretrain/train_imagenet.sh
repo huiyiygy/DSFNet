@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-
-CUDA_VISIBLE_DEVICES=0 python train_imagenet.py --epochs 90 -b 128 --lr 0.01 --gpu 0

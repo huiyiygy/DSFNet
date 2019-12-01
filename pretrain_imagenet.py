@@ -15,11 +15,11 @@ import torch.utils.data.distributed
 import torchvision.transforms as transforms
 import torchvision.datasets as datasets
 
-from imagenet_pretrain.xception_imagenet_pretrain import XceptionClassifier
+from model.xception_imagenet_pretrain import XceptionClassifier
 
 
 parser = argparse.ArgumentParser(description='PyTorch ImageNet Training')
-parser.add_argument('data',  default='/home/lab/ygy/dataset/ImageNet', type=str, metavar='DIR',
+parser.add_argument('--data',  default='/home/lab/ygy/dataset/ImageNet', type=str,
                     help='path to dataset')
 parser.add_argument('-j', '--workers', default=4, type=int, metavar='N',
                     help='number of data loading workers (default: 4)')
@@ -72,7 +72,7 @@ def main_worker(gpu,  args):
     model = XceptionClassifier()
 
     if args.gpu is not None:
-        model = torch.nn.DataParallel(model, device_ids=args.gpu).cuda()
+        model = torch.nn.DataParallel(model, device_ids=[args.gpu]).cuda()
 
     # define loss function (criterion) and optimizer
     criterion = nn.CrossEntropyLoss().cuda(args.gpu)
