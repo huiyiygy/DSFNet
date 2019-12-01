@@ -133,7 +133,7 @@ class Xception(nn.Module):
         Inputs:
         -------
         - output_stride: 8 or 16
-        - BatchNorm: nn.SyncBatchNorm or nn.BatchNorm2d
+        - BatchNorm: SyncBatchNorm or nn.BatchNorm2d
         """
         super(Xception, self).__init__()
 
