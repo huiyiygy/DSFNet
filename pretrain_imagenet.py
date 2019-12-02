@@ -71,7 +71,9 @@ def main_worker(gpu,  args):
     # define loss function (criterion) and optimizer
     criterion = nn.CrossEntropyLoss().cuda(args.gpu)
 
-    optimizer = torch.optim.SGD(model.parameters(), args.lr, momentum=args.momentum, weight_decay=args.weight_decay)
+    # optimizer = torch.optim.SGD(model.parameters(), args.lr, momentum=args.momentum, weight_decay=args.weight_decay, nesterov=True)
+    optimizer = torch.optim.Adam(model.parameters(), args.lr, weight_decay=args.weight_decay)
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='max', factor=0.3, patience=5, verbose=True, min_lr=1e-10)
 
     # optionally resume from a checkpoint
     if args.resume:
@@ -118,13 +120,15 @@ def main_worker(gpu,  args):
         num_workers=args.workers, pin_memory=True)
 
     for epoch in range(args.start_epoch, args.epochs):
-        adjust_learning_rate(optimizer, epoch, args)
+        # adjust_learning_rate(optimizer, epoch, args)
 
         # train for one epoch
         train(train_loader, model, criterion, optimizer, epoch, args)
 
         # evaluate on validation set
         acc1 = validate(val_loader, model, criterion, args)
+
+        scheduler.step(acc1, epoch=epoch)
 
         # remember best acc@1 and save checkpoint
         is_best = acc1 > best_acc1
@@ -225,9 +229,10 @@ def validate(val_loader, model, criterion, args):
 
 
 def save_checkpoint(state, is_best, filename='checkpoint.pth.tar'):
-    torch.save(state, filename)
+    save_path = os.path.join('checkpoint', 'pretrain_imagenet', filename)
+    torch.save(state, save_path)
     if is_best:
-        shutil.copyfile(filename, 'model_best.pth.tar')
+        shutil.copyfile(save_path, 'model_best.pth.tar')
 
 
 class AverageMeter(object):
