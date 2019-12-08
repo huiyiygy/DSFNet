@@ -59,7 +59,10 @@ class CityscapesSegmentation(data.Dataset):
         _tmp = self.encode_segmap(_tmp)
         _target = Image.fromarray(_tmp)
 
-        sample = {'image': _img, 'label': _target}
+        if self.split != 'test':
+            sample = {'image': _img, 'label': _target}
+        else:
+            sample = {'image': _img, 'label': _target, 'img_path': img_path}
 
         if self.split == 'train':
             return self.transform_train(sample)

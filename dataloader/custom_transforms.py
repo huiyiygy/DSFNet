@@ -25,8 +25,10 @@ class Normalize(object):
         img -= self.mean
         img /= self.std
 
-        return {'image': img,
-                'label': mask}
+        sample['image'] = img
+        sample['label'] = mask
+
+        return sample
 
 
 class ToTensor(object):
@@ -43,8 +45,10 @@ class ToTensor(object):
         img = torch.from_numpy(img).float()
         mask = torch.from_numpy(mask).float()
 
-        return {'image': img,
-                'label': mask}
+        sample['image'] = img
+        sample['label'] = mask
+
+        return sample
 
 
 class RandomHorizontalFlip(object):
@@ -55,19 +59,21 @@ class RandomHorizontalFlip(object):
             img = img.transpose(Image.FLIP_LEFT_RIGHT)
             mask = mask.transpose(Image.FLIP_LEFT_RIGHT)
 
-        return {'image': img,
-                'label': mask}
+        sample['image'] = img
+        sample['label'] = mask
+
+        return sample
 
 
 class RandomGaussianBlur(object):
     def __call__(self, sample):
         img = sample['image']
-        mask = sample['label']
         if random.random() < 0.5:
             img = img.filter(ImageFilter.GaussianBlur(radius=random.random()))
 
-        return {'image': img,
-                'label': mask}
+        sample['image'] = img
+
+        return sample
 
 
 class RandomNoise(object):
@@ -117,8 +123,10 @@ class RandomScaleCrop(object):
         img = img.crop((x1, y1, x1 + self.crop_size, y1 + self.crop_size))
         mask = mask.crop((x1, y1, x1 + self.crop_size, y1 + self.crop_size))
 
-        return {'image': img,
-                'label': mask}
+        sample['image'] = img
+        sample['label'] = mask
+
+        return sample
 
 
 class FixScaleCrop(object):
@@ -144,13 +152,15 @@ class FixScaleCrop(object):
         img = img.crop((x1, y1, x1 + self.crop_size, y1 + self.crop_size))
         mask = mask.crop((x1, y1, x1 + self.crop_size, y1 + self.crop_size))
 
-        return {'image': img,
-                'label': mask}
+        sample['image'] = img
+        sample['label'] = mask
+
+        return sample
 
 
 class FixedResize(object):
     def __init__(self, size):
-        self.size = (size, size)  # size: (h, w)
+        self.size = (size, size * 2)  # size: (h, w)
 
     def __call__(self, sample):
         img = sample['image']
@@ -161,5 +171,7 @@ class FixedResize(object):
         img = img.resize(self.size, Image.BILINEAR)
         mask = mask.resize(self.size, Image.NEAREST)
 
-        return {'image': img,
-                'label': mask}
+        sample['image'] = img
+        sample['label'] = mask
+
+        return sample

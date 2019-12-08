@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
 """
-@function: 基于Depthwise Separable Factorization Convolution的AlignedXception
+@function: 基于Depthwise Separable Factorization Convolution的Xception
 @author:HuiYi or 会意
 @file:xception.py
 @time:2019/11/15 13:28
@@ -245,9 +245,9 @@ if __name__ == "__main__":
     print(output.size())  # [1, 256, 64, 64]
     print(low_level_feat.size())  # [1, 64, 128, 128]
 
-    # visualize the architecture of AlignedXception
+    # visualize the architecture of Xception
     # from torch.utils.tensorboard import SummaryWriter
-    # with SummaryWriter('../../checkpoint', comment='AlignedXception') as w:
+    # with SummaryWriter('../../checkpoint', comment='Xception') as w:
     #     w.add_graph(model, inputs)
 
     # (3, 512, 512)
