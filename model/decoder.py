@@ -13,6 +13,20 @@ from model.backbone.xception import DSFBlock
 from model.sync_batchnorm import SynchronizedBatchNorm2d
 
 
+class ConvBnRelu(nn.Module):
+    def __init__(self, in_ch, out_ch, BatchNorm=None):
+        super(ConvBnRelu, self).__init__()
+
+        self.conv = nn.Sequential(
+            nn.Conv2d(in_ch, out_ch, 3, 1, 1, bias=False),
+            BatchNorm(out_ch),
+            nn.ReLU(inplace=True)
+        )
+
+    def forward(self, x):
+        return self.conv(x)
+
+
 class DSFConvBnRelu(nn.Module):
     def __init__(self, in_ch, out_ch, stride=1, dilation=1, BatchNorm=None):
         super(DSFConvBnRelu, self).__init__()
@@ -128,9 +142,8 @@ class AttentionDecoder(nn.Module):
         x = self.conv(x)
 
         x1 = torch.mul(x, spatial_attention)
-        x = x + x1
         x2 = torch.mul(x, channel_attention)
-        x = x + x2
+        x = x + x1 + x2
 
         x = F.interpolate(x, size=low_level_feat.size()[2:], mode='bilinear', align_corners=True)
         x = torch.cat((x, low_level_feat), dim=1)
