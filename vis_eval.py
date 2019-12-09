@@ -5,6 +5,8 @@
 @file:vis_eval.py
 @time:2019/11/14 14:07
 """
+import os
+import numpy as np
 import torch
 from tqdm import tqdm
 
@@ -24,12 +26,15 @@ def save_predicted_image(pred, img_path, save_folder):
     num = rgb.shape[0]
     for i in range(num):
         img = Image.fromarray(rgb[i], mode='RGB')
-        path = os.path.join(save_folder, img_path[i].split(os.sep)[-2], os.path.basename(img_path[i]))
+        folder = os.path.join(save_folder, img_path[i].split(os.sep)[-2])
+        if not os.path.exists(folder):
+            os.makedirs(folder)
+        path = os.path.join(folder, os.path.basename(img_path[i]))
         img.save(path)
 
 
 def main(args):
-    test_set = cityscapes.CityscapesSegmentation(args, split='test')
+    test_set = cityscapes.CityscapesSegmentation(args, split='val',  mode='test')
     test_loader = DataLoader(test_set, batch_size=args.batch_size, shuffle=False, num_workers=2, pin_memory=True)
 
     nclass = 19
@@ -49,10 +54,10 @@ def main(args):
 
     if not os.path.exists(args.checkpoint_folder):
         raise RuntimeError("=> no checkpoint folder found at '{}'".format(args.checkpoint_folder))
-    checkpoint = torch.load(os.path.join(args.checkpoint_file, 'checkpoint.pth.tar'))
+    checkpoint = torch.load(os.path.join(args.checkpoint_folder, 'model_best.pth.tar'))
 
     model.load_state_dict(checkpoint['state_dict'])
-    print("=> loaded checkpoint '{}'".format(args.checkpoint_file))
+    print("=> loaded checkpoint at '{}'".format(args.checkpoint_folder))
 
     model.eval()
 
@@ -72,7 +77,7 @@ def main(args):
         if args.cuda:
             image, target = image.cuda(), target.cuda()
         with torch.no_grad():
-            output = self.model(image)
+            output = model(image)
         loss = criterion(output, target)
         test_loss += loss.item()
         tbar.set_description('Test loss: %.6f' % (test_loss / (i + 1)))
@@ -91,8 +96,8 @@ def main(args):
     FWIoU = evaluator.frequency_weighted_intersection_over_union()
     print('test Result:')
     print("pixel_acc:{}, mean_class_pixel_acc:{}, mIoU:{}, fwIoU: {}".format(pixel_accuracy, mean_class_pixel_accuracy, mIoU, FWIoU))
-    with open(os.path.join(args.checkpoint_folder, 'test_set_mIOU.txt'), 'w') as f:
-        f.write("pixel_accuracy:{}\n mean_class_pixel_accuracy:{}\n mIoU:{}\n fwIoU: {}".format(pixel_accuracy, mean_class_pixel_accuracy, mIoU, FWIoU))
+    with open(os.path.join(args.checkpoint_folder, 'val_set_mIOU.txt'), 'w') as f:
+        f.write("pixel_accuracy:{}\nmean_class_pixel_accuracy:{}\nmIoU:{}\nfwIoU: {}".format(pixel_accuracy, mean_class_pixel_accuracy, mIoU, FWIoU))
 
 
 if __name__ == '__main__':

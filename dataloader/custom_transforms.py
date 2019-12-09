@@ -160,7 +160,7 @@ class FixScaleCrop(object):
 
 class FixedResize(object):
     def __init__(self, size):
-        self.size = (size, size * 2)  # size: (h, w)
+        self.size = (size * 2, size)  # size: (w, h)
 
     def __call__(self, sample):
         img = sample['image']

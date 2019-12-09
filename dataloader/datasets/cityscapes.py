@@ -17,10 +17,11 @@ from dataloader import custom_transforms as tr
 class CityscapesSegmentation(data.Dataset):
     NUM_CLASSES = 19
 
-    def __init__(self, args, root=Path.db_root_dir('cityscapes'), split="train"):
+    def __init__(self, args, root=Path.db_root_dir('cityscapes'), split="train", mode='train'):
 
         self.root = root
         self.split = split
+        self.mode = mode
         self.args = args
         self.files = {}
 
@@ -59,15 +60,14 @@ class CityscapesSegmentation(data.Dataset):
         _tmp = self.encode_segmap(_tmp)
         _target = Image.fromarray(_tmp)
 
-        if self.split != 'test':
-            sample = {'image': _img, 'label': _target}
-        else:
-            sample = {'image': _img, 'label': _target, 'img_path': img_path}
+        sample = {'image': _img, 'label': _target, 'img_path': img_path}
 
         if self.split == 'train':
             return self.transform_train(sample)
-        elif self.split == 'val':
+        elif self.split == 'val' and self.mode == 'train':
             return self.transform_val(sample)
+        elif self.split == 'val' and self.mode == 'test':
+            return self.transform_test(sample)
         elif self.split == 'test':
             return self.transform_test(sample)
 
