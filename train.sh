@@ -44,3 +44,9 @@
 
 # experiment 15 native DSFNet out-stride 8 lr 0.01
 # CUDA_VISIBLE_DEVICES=0 python train.py --lr 0.01 --out-stride 8 --epochs 300 --batch-size 8 --base-size 512 --crop-size 512 --gpu-ids 0 --checkname dsfnet --eval-interval 1
+
+# experiment 16 attention DSFNet out-stride 8 lr 0.01 new attention mix method , attention no sigmoid
+# CUDA_VISIBLE_DEVICES=0 python train.py --lr 0.01 --use-attention --out-stride 8 --epochs 300 --batch-size 8 --base-size 512 --crop-size 512 --gpu-ids 0 --checkname dsfnet --eval-interval 1
+
+# experiment 17 attention DSFNet out-stride 8 lr 0.01 new attention
+CUDA_VISIBLE_DEVICES=0 python train.py --lr 0.01 --use-attention --out-stride 8 --epochs 300 --batch-size 8 --base-size 512 --crop-size 512 --gpu-ids 0 --checkname dsfnet --eval-interval 1

@@ -52,5 +52,6 @@ if __name__ == "__main__":
     # (3, 512, 512)
     # output_stride=8, use_attention=False FLOPs: 2.62 GMac Params: 503.17 k
     # output_stride=8, use_attention=True  FLOPs: 2.63 GMac Params: 522.7 k
+    # new attention output_stride=8, use_attention=True  FLOPs: 2.67 GMac Params: 560.45 k
     # from utils.flops_counter import get_flops_and_params
     # get_flops_and_params(DSFNet)

@@ -14,11 +14,11 @@ from model.sync_batchnorm import SynchronizedBatchNorm2d
 
 
 class ConvBnRelu(nn.Module):
-    def __init__(self, in_ch, out_ch, BatchNorm=None):
+    def __init__(self, in_ch, out_ch, kernel_size=3, stride=1, padding=0, BatchNorm=None):
         super(ConvBnRelu, self).__init__()
 
         self.conv = nn.Sequential(
-            nn.Conv2d(in_ch, out_ch, 3, 1, 1, bias=False),
+            nn.Conv2d(in_ch, out_ch, kernel_size, stride, padding, bias=False),
             BatchNorm(out_ch),
             nn.ReLU(inplace=True)
         )
@@ -84,34 +84,37 @@ class SpatialAttention(nn.Module):
     Residual Attention Network
     """
 
-    def __init__(self, in_ch, num_classes):
+    def __init__(self, in_ch, num_classes, BatchNorm=None):
         super(SpatialAttention, self).__init__()
 
-        self.max_pool = nn.MaxPool2d(2)
+        self.down1 = ConvBnRelu(in_ch, num_classes, kernel_size=3, stride=2, padding=2, BatchNorm=BatchNorm)
+        self.down2 = ConvBnRelu(num_classes, num_classes, kernel_size=3, stride=2, padding=2, BatchNorm=BatchNorm)
+        self.down3 = ConvBnRelu(num_classes, num_classes, kernel_size=3, stride=2, padding=1, BatchNorm=BatchNorm)
+
         self.sigmoid = nn.Sigmoid()
 
-        self.conv1 = nn.Conv2d(in_ch, num_classes, 1)
-        self.conv2 = nn.Conv2d(in_ch, num_classes, 1)
-        self.conv3 = nn.Conv2d(in_ch, num_classes, 1)
+        self.conv1 = ConvBnRelu(num_classes, num_classes, kernel_size=1, BatchNorm=BatchNorm)
+        self.conv2 = ConvBnRelu(num_classes, num_classes, kernel_size=1, BatchNorm=BatchNorm)
+        self.conv3 = ConvBnRelu(num_classes, num_classes, kernel_size=1, BatchNorm=BatchNorm)
 
     def forward(self, x):
-        down1 = self.max_pool(x)  # (32, 32) or (16, 16)
-        down2 = self.max_pool(down1)  # (16, 16) or (8, 8)
-        down3 = self.max_pool(down2)  # (8, 8) or (4, 4)
+        x1 = self.down1(x)  # (32, 32) or (16, 16)
+        x2 = self.down2(x1)  # (16, 16) or (8, 8)
+        x3 = self.down3(x2)  # (8, 8) or (4, 4)
 
-        down3 = self.conv3(down3)
-        down3 = F.interpolate(down3, size=down2.size()[2:], mode='bilinear', align_corners=True)
+        x3 = self.conv3(x3)
+        x3 = F.interpolate(x3, size=x2.size()[2:], mode='bilinear', align_corners=True)
 
-        down2 = self.conv2(down2)
-        down2 = down2 + down3
-        down2 = F.interpolate(down2, size=down1.size()[2:], mode='bilinear', align_corners=True)
+        x2 = self.conv2(x2)
+        x2 = x2 + x3
+        x2 = F.interpolate(x2, size=x1.size()[2:], mode='bilinear', align_corners=True)
 
-        down1 = self.conv1(down1)
-        down1 = down1 + down2
-        down1 = F.interpolate(down1, size=x.size()[2:], mode='bilinear', align_corners=True)
+        x1 = self.conv1(x1)
+        x1 = x1 + x2
+        x1 = F.interpolate(x1, size=x.size()[2:], mode='bilinear', align_corners=True)
 
-        down1 = self.sigmoid(down1)
-        return down1
+        x1 = self.sigmoid(x1)
+        return x1
 
 
 class AttentionDecoder(nn.Module):
@@ -122,10 +125,13 @@ class AttentionDecoder(nn.Module):
 
         self.channel_attention_branch = nn.Sequential(nn.AdaptiveAvgPool2d(1),
                                                       nn.Conv2d(256, num_classes, 1),
+                                                      ConvBnRelu(num_classes, num_classes, kernel_size=1, stride=1, padding=0, BatchNorm=BatchNorm),
+                                                      nn.Conv2d(num_classes, num_classes, 1),
+                                                      BatchNorm(num_classes),
                                                       nn.Sigmoid()
                                                       )
 
-        self.spatial_attention_branch = SpatialAttention(256, num_classes)
+        self.spatial_attention_branch = SpatialAttention(256, num_classes, BatchNorm)
 
         self.last_conv = nn.Sequential(DSFConvBnRelu(num_classes * 2, num_classes * 2, BatchNorm=BatchNorm),
                                        DSFConvBnRelu(num_classes * 2, num_classes * 2, BatchNorm=BatchNorm),
