@@ -87,15 +87,18 @@ class SpatialAttention(nn.Module):
     def __init__(self, in_ch, num_classes, BatchNorm=None):
         super(SpatialAttention, self).__init__()
 
-        self.down1 = ConvBnRelu(in_ch, num_classes, kernel_size=3, stride=2, padding=2, BatchNorm=BatchNorm)
-        self.down2 = ConvBnRelu(num_classes, num_classes, kernel_size=3, stride=2, padding=2, BatchNorm=BatchNorm)
-        self.down3 = ConvBnRelu(num_classes, num_classes, kernel_size=3, stride=2, padding=1, BatchNorm=BatchNorm)
+        self.down1 = DSFConvBnRelu(in_ch, in_ch, stride=2, BatchNorm=BatchNorm)
+        self.down2 = DSFConvBnRelu(in_ch, in_ch, stride=2, BatchNorm=BatchNorm)
+        self.down3 = DSFConvBnRelu(in_ch, in_ch, stride=2, BatchNorm=BatchNorm)
 
-        self.sigmoid = nn.Sigmoid()
+        self.conv1 = DSFConvBnRelu(in_ch, in_ch, stride=1, BatchNorm=BatchNorm)
+        self.conv2 = DSFConvBnRelu(in_ch, in_ch, stride=1, BatchNorm=BatchNorm)
+        self.conv3 = DSFConvBnRelu(in_ch, in_ch, stride=1, BatchNorm=BatchNorm)
 
-        self.conv1 = ConvBnRelu(num_classes, num_classes, kernel_size=1, BatchNorm=BatchNorm)
-        self.conv2 = ConvBnRelu(num_classes, num_classes, kernel_size=1, BatchNorm=BatchNorm)
-        self.conv3 = ConvBnRelu(num_classes, num_classes, kernel_size=1, BatchNorm=BatchNorm)
+        self.last_conv = nn.Sequential(nn.Conv2d(in_ch, num_classes, 1),
+                                       BatchNorm(num_classes),
+                                       nn.Sigmoid()
+                                       )
 
     def forward(self, x):
         x1 = self.down1(x)  # (32, 32) or (16, 16)
@@ -113,8 +116,8 @@ class SpatialAttention(nn.Module):
         x1 = x1 + x2
         x1 = F.interpolate(x1, size=x.size()[2:], mode='bilinear', align_corners=True)
 
-        x1 = self.sigmoid(x1)
-        return x1
+        x = self.last_conv(x1)
+        return x
 
 
 class AttentionDecoder(nn.Module):
@@ -124,9 +127,8 @@ class AttentionDecoder(nn.Module):
         self.conv = nn.Conv2d(256, num_classes, 1)
 
         self.channel_attention_branch = nn.Sequential(nn.AdaptiveAvgPool2d(1),
+                                                      ConvBnRelu(256, 256, kernel_size=1, BatchNorm=BatchNorm),
                                                       nn.Conv2d(256, num_classes, 1),
-                                                      ConvBnRelu(num_classes, num_classes, kernel_size=1, stride=1, padding=0, BatchNorm=BatchNorm),
-                                                      nn.Conv2d(num_classes, num_classes, 1),
                                                       BatchNorm(num_classes),
                                                       nn.Sigmoid()
                                                       )

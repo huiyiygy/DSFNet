@@ -22,7 +22,7 @@ def main(args):
     model = DSFNet(num_classes=19,
                    output_stride=args.out_stride,
                    sync_bn=False,
-                   use_attention=args.use_attention
+                   use_attention=True
                    )
     images = torch.randn(args.batch_size, 3, args.height, args.width)
     if not args.no_cuda and torch.cuda.is_available():
@@ -65,6 +65,5 @@ if __name__ == '__main__':
     parser.add_argument('--out-stride', type=int, default=8)
     parser.add_argument('--batch-size', type=int, default=30)
     parser.add_argument('--no-cuda', action='store_true', default=False)
-    parser.add_argument('--use-attention', action='store_true', default=True)
 
     main(parser.parse_args())
