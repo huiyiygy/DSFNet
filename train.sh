@@ -55,4 +55,10 @@
 # CUDA_VISIBLE_DEVICES=0 python train.py --lr 0.01 --use-attention --out-stride 8 --epochs 300 --batch-size 8 --base-size 512 --crop-size 512 --gpu-ids 0 --checkname dsfnet --eval-interval 1
 
 # experiment 19 attention DSFNet out-stride 8 lr 0.01 new attention delay reduction channels numbers in the attention branch
+# CUDA_VISIBLE_DEVICES=0 python train.py --lr 0.01 --use-attention --out-stride 8 --epochs 300 --batch-size 8 --base-size 512 --crop-size 512 --gpu-ids 0 --checkname dsfnet --eval-interval 1
+
+# experiment 20 attention DSFNet out-stride 8 lr 0.01 new attention delay reduction channels numbers in the attention branch No channel attention
+# CUDA_VISIBLE_DEVICES=0 python train.py --lr 0.01 --use-attention --out-stride 8 --epochs 300 --batch-size 8 --base-size 512 --crop-size 512 --gpu-ids 0 --checkname dsfnet --eval-interval 1
+
+# experiment 21 attention DSFNet out-stride 8 lr 0.01 new attention delay reduction channels numbers in the attention branch No spatial attention
 CUDA_VISIBLE_DEVICES=0 python train.py --lr 0.01 --use-attention --out-stride 8 --epochs 300 --batch-size 8 --base-size 512 --crop-size 512 --gpu-ids 0 --checkname dsfnet --eval-interval 1
