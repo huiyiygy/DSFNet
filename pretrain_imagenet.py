@@ -12,7 +12,7 @@ import torch.utils.data
 import torchvision.transforms as transforms
 import torchvision.datasets as datasets
 
-from model.xception_imagenet_pretrain import XceptionClassifier
+from model.light_xception_imagenet_pretrain import XceptionClassifier
 
 
 def main():

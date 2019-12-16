@@ -2,7 +2,7 @@
 """
 @function: 基于Depthwise Separable Factorization Convolution的Xception
 @author:HuiYi or 会意
-@file:xception.py
+@file:light_xception.py
 @time:2019/11/15 13:28
 """
 import math
@@ -124,9 +124,9 @@ class XceptionBlock(nn.Module):
         return x
 
 
-class Xception(nn.Module):
+class LightXception(nn.Module):
     """
-    Xception
+    LightXception
     """
     def __init__(self, output_stride=8, BatchNorm=nn.BatchNorm2d):
         """
@@ -135,7 +135,7 @@ class Xception(nn.Module):
         - output_stride: 8 or 16
         - BatchNorm: SyncBatchNorm or nn.BatchNorm2d
         """
-        super(Xception, self).__init__()
+        super(LightXception, self).__init__()
 
         if output_stride == 16:
             entry_block3_stride = 2
@@ -239,13 +239,13 @@ class Xception(nn.Module):
 
 
 if __name__ == "__main__":
-    model = Xception(output_stride=8, BatchNorm=nn.BatchNorm2d)
+    model = LightXception(output_stride=8, BatchNorm=nn.BatchNorm2d)
     inputs = torch.rand(1, 3, 512, 512)
     output, low_level_feat = model(inputs)
     print(output.size())  # [1, 256, 64, 64]
     print(low_level_feat.size())  # [1, 64, 128, 128]
 
-    # visualize the architecture of Xception
+    # visualize the architecture of LightXception
     # from torch.utils.tensorboard import SummaryWriter
     # with SummaryWriter('../../checkpoint', comment='Xception') as w:
     #     w.add_graph(model, inputs)
@@ -253,4 +253,4 @@ if __name__ == "__main__":
     # (3, 512, 512)
     # output_stride=8 Flops:  2.53 GMac Params: 493.95 k
     # from utils.flops_counter import get_flops_and_params
-    # get_flops_and_params(Xception)
+    # get_flops_and_params(LightXception)

@@ -2,13 +2,13 @@
 """
 @function: ImageNet预训练模型
 @author:HuiYi or 会意
-@file:xception_imagenet_pretrain.py
+@file:light_xception_imagenet_pretrain.py
 @time:2019/11/30 16:32
 """
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from model.backbone.xception import Xception
+from model.backbone.light_xception import LightXception
 
 
 class XceptionClassifier(nn.Module):

@@ -9,7 +9,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from model.backbone.xception import DSFBlock
+from model.backbone.light_xception import DSFBlock
 from model.sync_batchnorm import SynchronizedBatchNorm2d
 
 

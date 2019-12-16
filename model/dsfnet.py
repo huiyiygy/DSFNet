@@ -9,7 +9,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from model.backbone.xception import Xception
+from model.backbone.light_xception import LightXception
 from model.decoder import build_decoder
 from model.sync_batchnorm import SynchronizedBatchNorm2d
 
@@ -31,7 +31,7 @@ class DSFNet(nn.Module):
         else:
             BatchNorm = nn.BatchNorm2d
 
-        self.encoder = Xception(output_stride, BatchNorm)
+        self.encoder = LightXception(output_stride, BatchNorm)
         self.decoder = build_decoder(num_classes, BatchNorm, use_attention)
 
     def forward(self, inputs):
