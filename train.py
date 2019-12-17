@@ -40,7 +40,8 @@ class Trainer(object):
         self.model = DSFNet(num_classes=self.nclass,
                             output_stride=args.out_stride,
                             sync_bn=args.sync_bn,
-                            use_attention=args.use_attention
+                            use_attention=args.use_attention,
+                            backbone=args.backbone
                             )
 
         # Define Optimizer
@@ -212,7 +213,7 @@ class Trainer(object):
 def main():
     parser = argparse.ArgumentParser(description="PyTorch DSFNet Training")
     parser.add_argument('--backbone', type=str, default='light_xception',
-                        choices=['xception', 'light_xception'], help='backbone name (default: light_xception)')
+                        choices=['separable_xception', 'light_xception', 'native_xception'], help='backbone name (default: light_xception)')
     parser.add_argument('--out-stride', type=int, default=8,
                         choices=[8, 16], help='network output stride (default: 8)')
     parser.add_argument('--dataset', type=str, default='cityscapes',

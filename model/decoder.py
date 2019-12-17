@@ -14,7 +14,7 @@ from model.sync_batchnorm import SynchronizedBatchNorm2d
 
 
 class ConvBnRelu(nn.Module):
-    def __init__(self, in_ch, out_ch, kernel_size=3, stride=1, padding=0, BatchNorm=None):
+    def __init__(self, in_ch, out_ch, kernel_size=3, stride=1, padding=1, BatchNorm=None):
         super(ConvBnRelu, self).__init__()
 
         self.conv = nn.Sequential(
@@ -53,8 +53,8 @@ class NativeDecoder(nn.Module):
         self.low_level_feat_branch = nn.Conv2d(64, num_classes, 1)
         self.conv = nn.Conv2d(256, num_classes, 1)
 
-        self.last_conv = nn.Sequential(DSFConvBnRelu(num_classes * 2, num_classes * 2, BatchNorm=BatchNorm),
-                                       DSFConvBnRelu(num_classes * 2, num_classes * 2, BatchNorm=BatchNorm),
+        self.last_conv = nn.Sequential(Block(num_classes * 2, num_classes * 2, BatchNorm=BatchNorm),
+                                       Block(num_classes * 2, num_classes * 2, BatchNorm=BatchNorm),
                                        nn.Conv2d(num_classes * 2, num_classes, kernel_size=1, stride=1)
                                        )
         self._init_weight()
@@ -87,13 +87,13 @@ class SpatialAttention(nn.Module):
     def __init__(self, in_ch, num_classes, BatchNorm=None):
         super(SpatialAttention, self).__init__()
 
-        self.down1 = DSFConvBnRelu(in_ch, in_ch, stride=2, BatchNorm=BatchNorm)
-        self.down2 = DSFConvBnRelu(in_ch, in_ch, stride=2, BatchNorm=BatchNorm)
-        self.down3 = DSFConvBnRelu(in_ch, in_ch, stride=2, BatchNorm=BatchNorm)
+        self.down1 = Block(in_ch, in_ch, stride=2, BatchNorm=BatchNorm)
+        self.down2 = Block(in_ch, in_ch, stride=2, BatchNorm=BatchNorm)
+        self.down3 = Block(in_ch, in_ch, stride=2, BatchNorm=BatchNorm)
 
-        self.conv1 = DSFConvBnRelu(in_ch, in_ch, stride=1, BatchNorm=BatchNorm)
-        self.conv2 = DSFConvBnRelu(in_ch, in_ch, stride=1, BatchNorm=BatchNorm)
-        self.conv3 = DSFConvBnRelu(in_ch, in_ch, stride=1, BatchNorm=BatchNorm)
+        self.conv1 = Block(in_ch, in_ch, stride=1, BatchNorm=BatchNorm)
+        self.conv2 = Block(in_ch, in_ch, stride=1, BatchNorm=BatchNorm)
+        self.conv3 = Block(in_ch, in_ch, stride=1, BatchNorm=BatchNorm)
 
         self.last_conv = nn.Sequential(nn.Conv2d(in_ch, num_classes, 1),
                                        BatchNorm(num_classes),
@@ -127,7 +127,7 @@ class AttentionDecoder(nn.Module):
         self.conv = nn.Conv2d(256, num_classes, 1)
 
         self.channel_attention_branch = nn.Sequential(nn.AdaptiveAvgPool2d(1),
-                                                      ConvBnRelu(256, 256, kernel_size=1, BatchNorm=BatchNorm),
+                                                      ConvBnRelu(256, 256, kernel_size=1, padding=0, BatchNorm=BatchNorm),
                                                       nn.Conv2d(256, num_classes, 1),
                                                       BatchNorm(num_classes),
                                                       nn.Sigmoid()
@@ -135,8 +135,8 @@ class AttentionDecoder(nn.Module):
 
         self.spatial_attention_branch = SpatialAttention(256, num_classes, BatchNorm)
 
-        self.last_conv = nn.Sequential(DSFConvBnRelu(num_classes * 2, num_classes * 2, BatchNorm=BatchNorm),
-                                       DSFConvBnRelu(num_classes * 2, num_classes * 2, BatchNorm=BatchNorm),
+        self.last_conv = nn.Sequential(Block(num_classes * 2, num_classes * 2, BatchNorm=BatchNorm),
+                                       Block(num_classes * 2, num_classes * 2, BatchNorm=BatchNorm),
                                        nn.Conv2d(num_classes * 2, num_classes, kernel_size=1, stride=1)
                                        )
         self._init_weight()
@@ -168,7 +168,13 @@ class AttentionDecoder(nn.Module):
                 m.bias.data.zero_()
 
 
-def build_decoder(num_classes, BatchNorm, use_attention):
+Block = DSFConvBnRelu
+
+
+def build_decoder(num_classes, BatchNorm, use_attention, backbone):
+    if backbone != 'light_xception':
+        global Block
+        Block = ConvBnRelu
     if not use_attention:
         return NativeDecoder(num_classes, BatchNorm)
     else:

@@ -2,7 +2,7 @@
 """
 @function:
 @author:HuiYi or 会意
-@file:xception.py
+@file:separable_xception.py
 @time:2019/12/16 15:32
 """
 import math
