@@ -22,7 +22,7 @@ def main(args):
     model = DSFNet(num_classes=19,
                    output_stride=args.out_stride,
                    sync_bn=False,
-                   use_attention=True,
+                   use_attention=args.use_attention,
                    backbone=args.backbone
                    )
     images = torch.randn(args.batch_size, 3, args.height, args.width)
@@ -66,11 +66,16 @@ if __name__ == '__main__':
     parser.add_argument('--out-stride', type=int, default=8)
     parser.add_argument('--batch-size', type=int, default=30)
     parser.add_argument('--no-cuda', action='store_true', default=False)
-    parser.add_argument('--backbone', type=str, default='separable_xception',
+    parser.add_argument('--use-attention', action='store_true', default=True)
+    parser.add_argument('--backbone', type=str, default='light_xception',
                         choices=['separable_xception', 'light_xception', 'native_xception'])
 
     main(parser.parse_args())
-    # DSFNet os 8 FPS:45
+    # DSFNet os 8 attention FPS:45
     # os 8 with spatial attention FPS:45
     # os 8 with channel attention FPS:46
     # os 8 without attention FPS:46
+    # SeparableXception os 8 attention FPS:56
+    # SeparableXception os 8 without attention FPS:59
+    # NativeXception os 8 attention FPS:43
+    # NativeXception os 8 without attention FPS:45
