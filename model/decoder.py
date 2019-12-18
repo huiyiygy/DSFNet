@@ -9,7 +9,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from model.backbone.light_xception import DSFBlock
+from model.backbone.light_xception import DSFBlock, DSFConv
+from model.backbone.separable_xception import SeparableConv2d
 from model.sync_batchnorm import SynchronizedBatchNorm2d
 
 
@@ -27,12 +28,26 @@ class ConvBnRelu(nn.Module):
         return self.conv(x)
 
 
+class SeparableConvBnRelu(nn.Module):
+    def __init__(self, in_ch, out_ch, kernel_size=3, stride=1, padding=1, BatchNorm=None):
+        super(SeparableConvBnRelu, self).__init__()
+
+        self.conv = nn.Sequential(
+            SeparableConv2d(in_ch, out_ch, kernel_size, stride, padding, BatchNorm=BatchNorm),
+            BatchNorm(out_ch),
+            nn.ReLU(inplace=True)
+        )
+
+    def forward(self, x):
+        return self.conv(x)
+
+
 class DSFConvBnRelu(nn.Module):
     def __init__(self, in_ch, out_ch, stride=1, dilation=1, BatchNorm=None):
         super(DSFConvBnRelu, self).__init__()
 
         self.conv = nn.Sequential(
-            DSFBlock(in_ch, out_ch, stride, dilation, BatchNorm=BatchNorm),
+            DSF(in_ch, out_ch, stride, dilation, BatchNorm=BatchNorm),
             BatchNorm(out_ch),
             nn.ReLU(inplace=True)
         )
@@ -169,12 +184,17 @@ class AttentionDecoder(nn.Module):
 
 
 Block = DSFConvBnRelu
+DSF = DSFConv
 
 
-def build_decoder(num_classes, BatchNorm, use_attention, backbone):
-    if backbone != 'light_xception':
-        global Block
+def build_decoder(num_classes, BatchNorm, use_attention, backbone, use_channel_shuffle):
+    global Block, DSF
+    if backbone == 'native_xception':
         Block = ConvBnRelu
+    elif backbone == 'light_xception' and use_channel_shuffle:
+        DSF = DSFBlock
+    elif backbone == 'separable_xception':
+        Block = SeparableConvBnRelu
     if not use_attention:
         return NativeDecoder(num_classes, BatchNorm)
     else:

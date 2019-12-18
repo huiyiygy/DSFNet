@@ -41,7 +41,9 @@ def main(args):
     model = DSFNet(num_classes=nclass,
                    output_stride=args.out_stride,
                    sync_bn=False,
-                   use_attention=args.use_attention
+                   use_attention=args.use_attention,
+                   backbone=args.backbone,
+                   use_channel_shuffle=args.use_channel_shuffle
                    )
     if not args.no_cuda and torch.cuda.is_available():
         args.cuda = True
@@ -102,11 +104,15 @@ def main(args):
 
 if __name__ == '__main__':
     parser = ArgumentParser()
+    parser.add_argument('--backbone', type=str, default='light_xception',
+                        choices=['separable_xception', 'light_xception', 'native_xception'], help='backbone name (default: light_xception)')
     parser.add_argument('--crop-size', type=int, default=512)  # short size , long size = crop size * 2
     parser.add_argument('--out-stride', type=int, default=8)
     parser.add_argument('--batch-size', type=int, default=30)
     parser.add_argument('--no-cuda', action='store_true', default=False)
     parser.add_argument('--use-attention', action='store_true', default=False)
+    parser.add_argument('--use-channel-shuffle', action='store_true', default=False,
+                        help='Only for light_xception, whether to use channel shuffle in DSFNet (default: False)')
     parser.add_argument('--is-vis', action='store_true', default=False)
     parser.add_argument('--checkpoint-folder', type=str, default=None,
                         help='put the path to checkpoint folder')

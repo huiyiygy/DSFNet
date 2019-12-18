@@ -23,7 +23,8 @@ def main(args):
                    output_stride=args.out_stride,
                    sync_bn=False,
                    use_attention=args.use_attention,
-                   backbone=args.backbone
+                   backbone=args.backbone,
+                   use_channel_shuffle=args.use_channel_shuffle
                    )
     images = torch.randn(args.batch_size, 3, args.height, args.width)
     if not args.no_cuda and torch.cuda.is_available():
@@ -52,7 +53,8 @@ def main(args):
             mean_time = sum(time_train) / len(time_train) / args.batch_size
             pre_FPS = round(1 / pre_img_time)
             mean_FPS = round(1 / mean_time)
-            print("Forward time per img (b=%d): %.4f s (Mean: %.4f s, pre_FPS: %d, mean_FPS: %d)" % (args.batch_size, pre_img_time, mean_time, pre_FPS, mean_FPS))
+            print("Forward time per img (b=%d): %.4f s (Mean: %.4f s, pre_FPS: %d, mean_FPS: %d)" % (args.batch_size, pre_img_time, mean_time,
+                                                                                                     pre_FPS, mean_FPS))
 
         time.sleep(1)  # to avoid overheating the GPU too much
         i += 1
@@ -67,15 +69,19 @@ if __name__ == '__main__':
     parser.add_argument('--batch-size', type=int, default=30)
     parser.add_argument('--no-cuda', action='store_true', default=False)
     parser.add_argument('--use-attention', action='store_true', default=True)
+    parser.add_argument('--use-channel-shuffle', action='store_true', default=False,
+                        help='Only for light_xception, whether to use channel shuffle in DSFNet (default: False)')
     parser.add_argument('--backbone', type=str, default='light_xception',
                         choices=['separable_xception', 'light_xception', 'native_xception'])
 
     main(parser.parse_args())
-    # DSFNet os 8 attention FPS:45
-    # os 8 with spatial attention FPS:45
-    # os 8 with channel attention FPS:46
-    # os 8 without attention FPS:46
-    # SeparableXception os 8 attention FPS:56
-    # SeparableXception os 8 without attention FPS:59
+    # DSFNet os 8 attention with channel shuffle FPS:45
+    # DSFNet os 8 with spatial attention with channel shuffle FPS:45
+    # DSFNet os 8 with channel attention with channel shuffle FPS:46
+    # DSFNet os 8 without attention with channel shuffle FPS:46
+    # DSFNet os 8 attention without channel shuffle FPS:58
+    # DSFNet os 8 without attention without channel shuffle FPS:62
+    # SeparableXception os 8 attention FPS:58
+    # SeparableXception os 8 without attention FPS:60
     # NativeXception os 8 attention FPS:43
     # NativeXception os 8 without attention FPS:45

@@ -5,7 +5,6 @@
 @file:light_xception.py
 @time:2019/11/15 13:28
 """
-import math
 import torch
 import torch.nn as nn
 
@@ -85,28 +84,28 @@ class XceptionBlock(nn.Module):
         filters = inplanes
         if grow_first:
             rep.append(self.relu)
-            rep.append(DSFBlock(inplanes, planes, dilation=dilation, BatchNorm=BatchNorm))
+            rep.append(Block(inplanes, planes, dilation=dilation, BatchNorm=BatchNorm))
             rep.append(BatchNorm(planes))
             filters = planes
 
         for i in range(reps - 1):
             rep.append(self.relu)
-            rep.append(DSFBlock(filters, filters, dilation=dilation, BatchNorm=BatchNorm))
+            rep.append(Block(filters, filters, dilation=dilation, BatchNorm=BatchNorm))
             rep.append(BatchNorm(filters))
 
         if not grow_first:
             rep.append(self.relu)
-            rep.append(DSFBlock(inplanes, planes, dilation=dilation, BatchNorm=BatchNorm))
+            rep.append(Block(inplanes, planes, dilation=dilation, BatchNorm=BatchNorm))
             rep.append(BatchNorm(planes))
 
         if stride != 1:
             rep.append(self.relu)
-            rep.append(DSFBlock(planes, planes, stride=stride, BatchNorm=BatchNorm))
+            rep.append(Block(planes, planes, stride=stride, BatchNorm=BatchNorm))
             rep.append(BatchNorm(planes))
 
         if stride == 1 and is_last:
             rep.append(self.relu)
-            rep.append(DSFBlock(planes, planes, BatchNorm=BatchNorm))
+            rep.append(Block(planes, planes, BatchNorm=BatchNorm))
             rep.append(BatchNorm(planes))
 
         if not start_with_relu:
@@ -124,11 +123,14 @@ class XceptionBlock(nn.Module):
         return x
 
 
+Block = DSFConv
+
+
 class LightXception(nn.Module):
     """
     LightXception
     """
-    def __init__(self, output_stride=8, BatchNorm=nn.BatchNorm2d):
+    def __init__(self, output_stride=8, BatchNorm=nn.BatchNorm2d, use_channel_shuffle=False):
         """
         Inputs:
         -------
@@ -148,12 +150,16 @@ class LightXception(nn.Module):
         else:
             raise NotImplementedError
 
+        if use_channel_shuffle:
+            global Block
+            Block = DSFBlock
+
         # Entry flow
         self.conv1 = DSFConv(3, 32, stride=2, BatchNorm=BatchNorm)
         self.bn1 = BatchNorm(32)
         self.relu = nn.ReLU(inplace=True)
 
-        self.conv2 = DSFBlock(32, 32, stride=1, BatchNorm=BatchNorm)
+        self.conv2 = Block(32, 32, stride=1, BatchNorm=BatchNorm)
         self.bn2 = BatchNorm(32)
 
         self.block1 = XceptionBlock(32, 64, reps=2, stride=2, BatchNorm=BatchNorm, start_with_relu=False)
@@ -173,13 +179,13 @@ class LightXception(nn.Module):
         # Exit flow
         self.block12 = XceptionBlock(128, 256, reps=2, stride=1, dilation=exit_block_dilations[0], BatchNorm=BatchNorm, grow_first=False, is_last=True)
 
-        self.conv3 = DSFBlock(256, 256, dilation=exit_block_dilations[1], BatchNorm=BatchNorm)
+        self.conv3 = Block(256, 256, dilation=exit_block_dilations[1], BatchNorm=BatchNorm)
         self.bn3 = BatchNorm(256)
 
-        self.conv4 = DSFBlock(256, 256, dilation=exit_block_dilations[2], BatchNorm=BatchNorm)
+        self.conv4 = Block(256, 256, dilation=exit_block_dilations[2], BatchNorm=BatchNorm)
         self.bn4 = BatchNorm(256)
 
-        self.conv5 = DSFBlock(256, 256, dilation=exit_block_dilations[3], BatchNorm=BatchNorm)
+        self.conv5 = Block(256, 256, dilation=exit_block_dilations[3], BatchNorm=BatchNorm)
         self.bn5 = BatchNorm(256)
 
         # Init weights
@@ -252,5 +258,6 @@ if __name__ == "__main__":
 
     # (3, 512, 512)
     # output_stride=8 Flops:  2.53 GMac Params: 493.95 k
+    # No channel shuffle output_stride=8 Flops:  4.4 GMac Params: 878.46 k
     # from utils.flops_counter import get_flops_and_params
     # get_flops_and_params(LightXception)

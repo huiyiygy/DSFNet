@@ -41,7 +41,8 @@ class Trainer(object):
                             output_stride=args.out_stride,
                             sync_bn=args.sync_bn,
                             use_attention=args.use_attention,
-                            backbone=args.backbone
+                            backbone=args.backbone,
+                            use_channel_shuffle=args.use_channel_shuffle
                             )
 
         # Define Optimizer
@@ -236,6 +237,8 @@ def main():
                         help='whether to use balanced weights (default: False)')
     parser.add_argument('--use-attention', action='store_true', default=False,
                         help='whether to use attention (default: False)')
+    parser.add_argument('--use-channel-shuffle', action='store_true', default=False,
+                        help='Only for light_xception, whether to use channel shuffle in DSFNet (default: False)')
     # optimizer params
     parser.add_argument('--optim', type=str, default='adam',
                         choices=['sgd', 'adam'], help='Optimizer: (default: adam)')

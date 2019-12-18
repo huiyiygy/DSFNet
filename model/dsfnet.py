@@ -15,7 +15,7 @@ from model.sync_batchnorm import SynchronizedBatchNorm2d
 
 
 class DSFNet(nn.Module):
-    def __init__(self, output_stride=8, num_classes=19, sync_bn=False, use_attention=False, backbone='light_xception'):
+    def __init__(self, output_stride=8, num_classes=19, sync_bn=False, use_attention=False, backbone='light_xception', use_channel_shuffle=False):
         """
         Inputs:
         -------
@@ -30,8 +30,8 @@ class DSFNet(nn.Module):
         else:
             BatchNorm = nn.BatchNorm2d
 
-        self.encoder = build_encoder(output_stride, BatchNorm, backbone)
-        self.decoder = build_decoder(num_classes, BatchNorm, use_attention, backbone)
+        self.encoder = build_encoder(output_stride, BatchNorm, backbone, use_channel_shuffle)
+        self.decoder = build_decoder(num_classes, BatchNorm, use_attention, backbone, use_channel_shuffle)
 
     def forward(self, inputs):
         x, low_level_feat = self.encoder(inputs)
@@ -42,18 +42,20 @@ class DSFNet(nn.Module):
 
 
 if __name__ == "__main__":
-    model = DSFNet(output_stride=16, use_attention=True)
-    model.eval()
-    inp = torch.rand(1, 3, 512, 512)
-    output = model(inp)
-    print(output.size())
+    # model = DSFNet(output_stride=16, use_attention=True)
+    # model.eval()
+    # inp = torch.rand(1, 3, 512, 512)
+    # output = model(inp)
+    # print(output.size())
 
+    from utils.flops_counter import get_flops_and_params
+    get_flops_and_params(DSFNet)
     # (3, 512, 512)
     # LightXception os=8, attention=False FLOPs: 2.62 GMac Params: 503.17 k
     # LightXception os=8, attention=True  FLOPs: 2.74 GMac Params: 794.1 k
-    # from utils.flops_counter import get_flops_and_params
-    # get_flops_and_params(DSFNet)
-    # SeparableXception os=8, attention=False FLOPs: 5.47 GMac Params: 925.1 k
-    # SeparableXception os=8, attention=True  FLOPs: 7.07 GMac Params: 4.54 M
+    # LightXception No channel shuffle os=8, attention=False FLOPs: 4.51 GMac Params: 889.12 k
+    # LightXception No channel shuffle os=8, attention=True  FLOPs: 4.72 GMac Params: 1.38 M
+    # SeparableXception os=8, attention=False FLOPs: 5.1 GMac Params: 902.83 k
+    # SeparableXception os=8, attention=True  FLOPs: 5.31 GMac Params: 1.39 M
     # NativeXception os=8, attention=False FLOPs: 13.1 GMac Params: 7.02 M
     # NativeXception os=8, attention=True  FLOPs: 14.71 GMac Params: 10.64 M
