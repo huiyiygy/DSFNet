@@ -6,7 +6,7 @@
 @time:2019/11/14 14:05
 """
 from dataloader.datasets import cityscapes
-from torch.utils.data import DataLoader
+from dataloader.utils import DataloaderX as DataLoader
 
 
 def make_data_loader(args, **kwargs):

@@ -12,6 +12,7 @@ import torch.utils.data
 import torchvision.transforms as transforms
 import torchvision.datasets as datasets
 
+from dataloader.utils import DataloaderX as DataLoader
 from model.light_xception_imagenet_pretrain import XceptionClassifier
 
 
@@ -105,10 +106,9 @@ def main_worker(gpu,  args):
             normalize,
         ]))
 
-    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True,
-                                               num_workers=args.workers, pin_memory=True)
+    train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True, num_workers=args.workers, pin_memory=True)
 
-    val_loader = torch.utils.data.DataLoader(
+    val_loader = DataLoader(
         datasets.ImageFolder(val_dir, transforms.Compose([
             transforms.Resize(256),
             transforms.CenterCrop(224),

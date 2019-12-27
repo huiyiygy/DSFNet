@@ -1,7 +1,14 @@
 # -*- coding: utf-8 -*-
 import matplotlib.pyplot as plt
 import numpy as np
-import torch
+
+from torch.utils.data import DataLoader
+from prefetch_generator import BackgroundGenerator
+
+
+class DataloaderX(DataLoader):
+    def __iter__(self):
+        return BackgroundGenerator(super().__iter__())
 
 
 def decode_seg_map_sequence(label_masks, dataset='cityscapes'):

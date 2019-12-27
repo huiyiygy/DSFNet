@@ -219,7 +219,7 @@ def main():
                         choices=[8, 16], help='network output stride (default: 8)')
     parser.add_argument('--dataset', type=str, default='cityscapes',
                         choices=['cityscapes'], help='dataset name (default: cityscapes)')
-    parser.add_argument('--workers', type=int, default=4, metavar='N', help='dataloader threads')
+    parser.add_argument('--workers', type=int, default=6, metavar='N', help='dataloader threads')
     parser.add_argument('--base-size', type=int, default=512, help='base image size')
     parser.add_argument('--crop-size', type=int, default=512, help='crop image size')
     parser.add_argument('--sync-bn', action='store_true', default=False,

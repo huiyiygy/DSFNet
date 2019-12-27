@@ -67,4 +67,37 @@
 # CUDA_VISIBLE_DEVICES=0 python train.py --backbone separable_xception --workers 16 --lr 0.01 --use-attention --out-stride 8 --epochs 300 --batch-size 8 --base-size 512 --crop-size 512 --gpu-ids 0 --eval-interval 1
 
 # experiment 23 attention SeparableXception out-stride 8 lr 0.01 decoder use separable conv
-CUDA_VISIBLE_DEVICES=0 python train.py --backbone separable_xception --workers 16 --lr 0.01 --use-attention --out-stride 8 --epochs 300 --batch-size 8 --base-size 512 --crop-size 512 --gpu-ids 0 --eval-interval 1
+# CUDA_VISIBLE_DEVICES=0 python train.py --backbone separable_xception --workers 16 --lr 0.01 --use-attention --out-stride 8 --epochs 300 --batch-size 8 --base-size 512 --crop-size 512 --gpu-ids 0 --eval-interval 1
+
+# experiment 24 native SeparableXception out-stride 8 lr 0.01 decoder use separable conv
+# CUDA_VISIBLE_DEVICES=0 python train.py --backbone separable_xception --workers 16 --lr 0.01 --out-stride 8 --epochs 300 --batch-size 8 --base-size 512 --crop-size 512 --gpu-ids 0 --eval-interval 1
+
+# experiment 25 attention DSFNet out-stride 8 lr 0.01 without channel shuffle
+# CUDA_VISIBLE_DEVICES=0 python train.py --lr 0.01 --use-attention --out-stride 8 --epochs 300 --batch-size 8 --base-size 512 --crop-size 512 --gpu-ids 0 --eval-interval 1
+
+# experiment 26 attention SeparableXception out-stride 8 lr 0.01 decoder use separable conv No channel attention
+# CUDA_VISIBLE_DEVICES=0 python train.py --backbone separable_xception --lr 0.01 --use-attention --out-stride 8 --epochs 300 --batch-size 8 --base-size 512 --crop-size 512 --gpu-ids 0 --eval-interval 1
+
+# experiment 27 attention SeparableXception out-stride 8 lr 0.01 decoder use separable conv No spatial attention
+# CUDA_VISIBLE_DEVICES=0 python train.py --backbone separable_xception --lr 0.01 --use-attention --out-stride 8 --epochs 300 --batch-size 8 --base-size 512 --crop-size 512 --gpu-ids 0 --eval-interval 1
+
+# experiment 28 native DSFNet out-stride 8 lr 0.01 without channel shuffle
+# CUDA_VISIBLE_DEVICES=1 python train.py --lr 0.01 --out-stride 8 --epochs 300 --batch-size 8 --base-size 512 --crop-size 512 --gpu-ids 0 --eval-interval 1
+
+# experiment 29 attention DSFNet out-stride 8 lr 0.01 without channel shuffle without spatial attention
+# CUDA_VISIBLE_DEVICES=0 python train.py --lr 0.01 --use-attention --out-stride 8 --epochs 300 --batch-size 8 --base-size 512 --crop-size 512 --gpu-ids 0 --eval-interval 1
+
+# experiment 30 attention DSFNet out-stride 8 lr 0.01 without channel shuffle without channel attention
+# CUDA_VISIBLE_DEVICES=0 python train.py --lr 0.01 --use-attention --out-stride 8 --epochs 300 --batch-size 8 --base-size 512 --crop-size 512 --gpu-ids 0 --eval-interval 1
+
+# experiment 31 attention NativeXception out-stride 8 lr 0.01
+CUDA_VISIBLE_DEVICES=0 python train.py --backbone native_xception --lr 0.01 --use-attention --out-stride 8 --epochs 300 --batch-size 8 --base-size 512 --crop-size 512 --gpu-ids 0 --eval-interval 1
+
+# experiment 32 native NativeXception out-stride 8 lr 0.01
+# CUDA_VISIBLE_DEVICES=0 python train.py --backbone native_xception --lr 0.01 --out-stride 8 --epochs 300 --batch-size 8 --base-size 512 --crop-size 512 --gpu-ids 0 --eval-interval 1
+
+# experiment 33 attention NativeXception out-stride 8 lr 0.01 without spatial attention
+# CUDA_VISIBLE_DEVICES=0 python train.py --backbone native_xception --lr 0.01 --use-attention --out-stride 8 --epochs 300 --batch-size 8 --base-size 512 --crop-size 512 --gpu-ids 0 --eval-interval 1
+
+# experiment 34 attention NativeXception out-stride 8 lr 0.01 without channel attention
+# CUDA_VISIBLE_DEVICES=0 python train.py --backbone native_xception --lr 0.01 --use-attention --out-stride 8 --epochs 300 --batch-size 8 --base-size 512 --crop-size 512 --gpu-ids 0 --eval-interval 1

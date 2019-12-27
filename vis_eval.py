@@ -12,7 +12,7 @@ from tqdm import tqdm
 
 from argparse import ArgumentParser
 from PIL import Image
-from torch.utils.data import DataLoader
+from dataloader.utils import DataloaderX as DataLoader
 
 from dataloader.datasets import cityscapes
 from dataloader.utils import decode_seg_map_sequence
