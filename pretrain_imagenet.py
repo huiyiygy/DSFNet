@@ -20,7 +20,7 @@ def main():
     parser = argparse.ArgumentParser(description='PyTorch ImageNet Training')
     parser.add_argument('--data', default='/home/lab/ygy/dataset/ImageNet', type=str,
                         help='path to dataset')
-    parser.add_argument('-j', '--workers', default=4, type=int, metavar='N',
+    parser.add_argument('-j', '--workers', default=6, type=int, metavar='N',
                         help='number of data loading workers (default: 4)')
     parser.add_argument('--epochs', default=90, type=int, metavar='N',
                         help='number of total epochs to run')
@@ -43,6 +43,8 @@ def main():
     parser.add_argument('--resume', default='', type=str, metavar='PATH',
                         help='path to latest checkpoint (default: none)')
     parser.add_argument('--gpu', default=None, type=int, help='GPU id to use.')
+    parser.add_argument('--use-channel-shuffle', action='store_true', default=False,
+                        help='whether to use channel shuffle (default: False)')
 
     args = parser.parse_args()
 
@@ -64,7 +66,7 @@ def main_worker(gpu,  args):
 
     # create model
     print("=> creating model Xception")
-    model = XceptionClassifier()
+    model = XceptionClassifier(use_channel_shuffle=args.use_channel_shuffle)
 
     if args.gpu is not None:
         model = torch.nn.DataParallel(model, device_ids=[args.gpu]).cuda()
@@ -138,7 +140,7 @@ def main_worker(gpu,  args):
             'state_dict': model.state_dict(),
             'best_acc1': best_acc1,
             'optimizer': optimizer.state_dict(),
-        }, is_best)
+        }, is_best, best_acc1)
 
 
 def train(train_loader, model, criterion, optimizer, epoch, args):
@@ -227,10 +229,14 @@ def validate(val_loader, model, criterion, args):
     return top1.avg
 
 
-def save_checkpoint(state, is_best, filename='checkpoint.pth.tar'):
-    save_path = os.path.join('checkpoint', 'pretrain_imagenet', filename)
-    torch.save(state, save_path)
+def save_checkpoint(state, is_best, best_acc1, filename='checkpoint.pth.tar'):
+    save_path = os.path.join('checkpoint', 'pretrain_imagenet')
+    if not os.path.exists(save_path):
+        os.makedirs(save_path)
+    torch.save(state, os.path.join(save_path, filename))
     if is_best:
+        with open(os.path.join(save_path, 'best_acc1.txt'), 'w') as f:
+            f.write(str(best_acc1))
         shutil.copyfile(save_path, os.path.join('checkpoint', 'pretrain_model_best.pth.tar'))
 
 

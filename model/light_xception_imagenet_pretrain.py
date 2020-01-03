@@ -12,10 +12,10 @@ from model.backbone.light_xception import LightXception
 
 
 class XceptionClassifier(nn.Module):
-    def __init__(self, num_classes=1000, output_stride=8):
+    def __init__(self, num_classes=1000, output_stride=8, use_channel_shuffle=False):
         super(XceptionClassifier, self).__init__()
 
-        self.backbone = Xception(output_stride=output_stride)
+        self.backbone = LightXception(output_stride=output_stride, use_channel_shuffle=use_channel_shuffle)
         self.fc = nn.Linear(256, num_classes)
 
     def forward(self, x):
