@@ -140,7 +140,7 @@ def main_worker(gpu,  args):
             'state_dict': model.state_dict(),
             'best_acc1': best_acc1,
             'optimizer': optimizer.state_dict(),
-        }, is_best, best_acc1)
+        }, is_best, best_acc1.data.cpu())
 
 
 def train(train_loader, model, criterion, optimizer, epoch, args):
@@ -233,11 +233,12 @@ def save_checkpoint(state, is_best, best_acc1, filename='checkpoint.pth.tar'):
     save_path = os.path.join('checkpoint', 'pretrain_imagenet')
     if not os.path.exists(save_path):
         os.makedirs(save_path)
-    torch.save(state, os.path.join(save_path, filename))
+    file_path = os.path.join(save_path, filename)
+    torch.save(state, file_path)
     if is_best:
         with open(os.path.join(save_path, 'best_acc1.txt'), 'w') as f:
             f.write(str(best_acc1))
-        shutil.copyfile(save_path, os.path.join('checkpoint', 'pretrain_model_best.pth.tar'))
+        shutil.copyfile(file_path, os.path.join('checkpoint', 'pretrain_model_best.pth.tar'))
 
 
 class AverageMeter(object):
