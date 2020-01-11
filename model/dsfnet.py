@@ -15,7 +15,8 @@ from model.sync_batchnorm import SynchronizedBatchNorm2d
 
 
 class DSFNet(nn.Module):
-    def __init__(self, output_stride=8, num_classes=19, sync_bn=False, use_attention=False, backbone='light_xception', use_channel_shuffle=False):
+    def __init__(self, output_stride=8, num_classes=19, sync_bn=False, use_attention=False, backbone='light_xception',
+                 use_channel_shuffle=False, pretrained=False, pretrain_file=None):
         """
         Inputs:
         -------
@@ -30,7 +31,7 @@ class DSFNet(nn.Module):
         else:
             BatchNorm = nn.BatchNorm2d
 
-        self.encoder = build_encoder(output_stride, BatchNorm, backbone, use_channel_shuffle)
+        self.encoder = build_encoder(output_stride, BatchNorm, backbone, use_channel_shuffle, pretrained, pretrain_file)
         self.decoder = build_decoder(num_classes, BatchNorm, use_attention, backbone, use_channel_shuffle)
 
     def forward(self, inputs):

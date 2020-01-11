@@ -4,10 +4,10 @@ from model.backbone.separable_xception import Xception
 from model.backbone.native_xception import NativeXception
 
 
-def build_encoder(output_stride, BatchNorm, backbone, use_channel_shuffle):
+def build_encoder(output_stride, BatchNorm, backbone, use_channel_shuffle, pretrain, pretrain_file):
     print('Using ' + backbone)
     if backbone == 'light_xception':
-        return LightXception(output_stride, BatchNorm, use_channel_shuffle)
+        return LightXception(output_stride, BatchNorm, use_channel_shuffle, pretrain, pretrain_file)
     elif backbone == 'separable_xception':
         return Xception(output_stride, BatchNorm)
     elif backbone == 'native_xception':

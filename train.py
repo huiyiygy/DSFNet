@@ -42,7 +42,9 @@ class Trainer(object):
                             sync_bn=args.sync_bn,
                             use_attention=args.use_attention,
                             backbone=args.backbone,
-                            use_channel_shuffle=args.use_channel_shuffle
+                            use_channel_shuffle=args.use_channel_shuffle,
+                            pretrained=args.pretrianed,
+                            pretrain_file=args.pretrian_file
                             )
 
         # Define Optimizer
@@ -56,7 +58,7 @@ class Trainer(object):
 
         # Define lr scheduler
         if self.args.lr_scheduler == 'plateau':
-            self.scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(self.optimizer,  mode='max', factor=0.3, verbose=True, min_lr=1e-8)
+            self.scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(self.optimizer,  mode='max', factor=0.3, verbose=True, min_lr=1e-10)
         elif self.args.lr_scheduler == 'step':
             self.scheduler = torch.optim.lr_scheduler.StepLR(self.optimizer, step_size=10, gamma=0.9)
         elif self.args.lr_scheduler == 'cos':
@@ -227,12 +229,12 @@ def main():
     parser.add_argument('--loss-type', type=str, default='ce',
                         choices=['ce', 'focal'], help='loss func type (default: ce)')
     # training hyper params
-    parser.add_argument('--epochs', type=int, default=None, metavar='N',
+    parser.add_argument('--epochs', type=int, default=300, metavar='N',
                         help='number of epochs to train (default: auto)')
     parser.add_argument('--start_epoch', type=int, default=0,
                         metavar='N', help='start epochs (default:0)')
-    parser.add_argument('--batch-size', type=int, default=None,
-                        metavar='N', help='input batch size for training (default: auto)')
+    parser.add_argument('--batch-size', type=int, default=8,
+                        metavar='N', help='input batch size for training (default: 8)')
     parser.add_argument('--use-balanced-weights', action='store_true', default=False,
                         help='whether to use balanced weights (default: False)')
     parser.add_argument('--use-attention', action='store_true', default=False,
@@ -242,7 +244,7 @@ def main():
     # optimizer params
     parser.add_argument('--optim', type=str, default='adam',
                         choices=['sgd', 'adam'], help='Optimizer: (default: adam)')
-    parser.add_argument('--lr', type=float, default=None, metavar='LR',
+    parser.add_argument('--lr', type=float, default=0.01, metavar='LR',
                         help='learning rate (default: auto)')
     parser.add_argument('--lr-scheduler', type=str, default='plateau',
                         choices=['plateau', 'step', 'cos'], help='lr scheduler mode: (default: plateau)')
@@ -260,6 +262,9 @@ def main():
     # checking point
     parser.add_argument('--resume', type=str, default=None, help='put the path to resuming file if needed')
     parser.add_argument('--checkname', type=str, default=None, help='set the checkpoint name')
+    parser.add_argument('--pretrained', action='store_true', default=False,
+                        help='backbone whether pretrained (default: False)')
+    parser.add_argument('--pretrain-file', type=str, default=None, help='set the pretrain file')
 
     # evaluation option
     parser.add_argument('--eval-interval', type=int, default=1, help='evaluation interval (default: 1)')
@@ -288,8 +293,8 @@ def main():
         args.batch_size = 4 * len(args.gpu_ids)
 
     if args.lr is None:
-        lrs = {'cityscapes': 0.001}
-        args.lr = lrs[args.dataset.lower()] / (4 * len(args.gpu_ids)) * args.batch_size
+        lrs = {'cityscapes': 0.01}
+        args.lr = lrs[args.dataset.lower()] / (8 * len(args.gpu_ids)) * args.batch_size
 
     if args.checkname is None:
         args.checkname = 'dsfnet-'+str(args.backbone)

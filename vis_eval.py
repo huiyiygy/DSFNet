@@ -35,7 +35,7 @@ def save_predicted_image(pred, img_path, save_folder):
 
 def main(args):
     test_set = cityscapes.CityscapesSegmentation(args, split='val',  mode='test')
-    test_loader = DataLoader(test_set, batch_size=args.batch_size, shuffle=False, num_workers=2, pin_memory=True)
+    test_loader = DataLoader(test_set, batch_size=args.batch_size, shuffle=False, num_workers=6, pin_memory=True)
 
     nclass = 19
     model = DSFNet(num_classes=nclass,

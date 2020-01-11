@@ -5,7 +5,6 @@
 @file:native_xception.py
 @time:2019/12/17 10:23
 """
-import math
 import torch
 import torch.nn as nn
 

@@ -5,6 +5,7 @@
 @file:light_xception.py
 @time:2019/11/15 13:28
 """
+import os
 import torch
 import torch.nn as nn
 
@@ -130,7 +131,7 @@ class LightXception(nn.Module):
     """
     LightXception
     """
-    def __init__(self, output_stride=8, BatchNorm=nn.BatchNorm2d, use_channel_shuffle=False):
+    def __init__(self, output_stride=8, BatchNorm=nn.BatchNorm2d, use_channel_shuffle=False, pretrained=False, pretrain_file=None):
         """
         Inputs:
         -------
@@ -191,6 +192,10 @@ class LightXception(nn.Module):
         # Init weights
         self._init_weight()
 
+        # Load pretrained model
+        if pretrained:
+            self._load_pretrained_model(pretrain_file)
+
     def forward(self, x):
         # Entry flow
         x = self.conv1(x)
@@ -242,6 +247,16 @@ class LightXception(nn.Module):
             elif isinstance(m, (nn.BatchNorm2d, SynchronizedBatchNorm2d)):
                 m.weight.data.fill_(1)
                 m.bias.data.zero_()
+
+    def _load_pretrained_model(self, pretrain_file):
+        if not os.path.isfile(pretrain_file):
+            raise RuntimeError("=> no pretrained model found at '{}'".format(pretrain_file))
+        pretrain_model = torch.load(pretrain_file)
+        pretrain_dict = pretrain_model['state_dict']
+        model_dict = {}
+        state_dict = self.state_dict()
+
+        # TODO: Load pretrained model
 
 
 if __name__ == "__main__":
