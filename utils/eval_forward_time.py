@@ -80,8 +80,14 @@ if __name__ == '__main__':
     # DSFNet os 8 with channel attention with channel shuffle FPS:46
     # DSFNet os 8 without attention with channel shuffle FPS:46
     # DSFNet os 8 attention without channel shuffle FPS:58
+    # DSFNet os 8 no channel attention without channel shuffle FPS:58
+    # DSFNet os 8 no spatial attention without channel shuffle FPS:
     # DSFNet os 8 without attention without channel shuffle FPS:62
     # SeparableXception os 8 attention FPS:58
-    # SeparableXception os 8 without attention FPS:60
+    # SeparableXception os 8 no channel attention FPS:58
+    # SeparableXception os 8 no spatial attention FPS:61
+    # SeparableXception os 8 without attention FPS:59
     # NativeXception os 8 attention FPS:43
+    # NativeXception os 8 no channel attention FPS:44
+    # NativeXception os 8 no spatial attention FPS:45
     # NativeXception os 8 without attention FPS:45

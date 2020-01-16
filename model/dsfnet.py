@@ -53,10 +53,18 @@ if __name__ == "__main__":
     get_flops_and_params(DSFNet)
     # (3, 512, 512)
     # LightXception os=8, attention=False FLOPs: 2.62 GMac Params: 503.17 k
+    # LightXception os=8, no channel attention FLOPs: 2.74 GMac Params: 723.13 k
+    # LightXception os=8, no spatial attention FLOPs: 2.62 GMac Params: 574.13 k
     # LightXception os=8, attention=True  FLOPs: 2.74 GMac Params: 794.1 k
     # LightXception No channel shuffle os=8, attention=False FLOPs: 4.51 GMac Params: 889.12 k
+    # LightXception os=8, No channel shuffle os=8, no channel attention FLOPs: 4.72 GMac Params: 1.31 M
+    # LightXception os=8, No channel shuffle os=8, no spatial attention FLOPs: 4.51 GMac Params: 960.09 M
     # LightXception No channel shuffle os=8, attention=True  FLOPs: 4.72 GMac Params: 1.38 M
     # SeparableXception os=8, attention=False FLOPs: 5.1 GMac Params: 902.83 k
+    # SeparableXception os=8, no channel attention FLOPs: 5.31 GMac Params: 1.32 M
+    # SeparableXception os=8, no spatial attention FLOPs:5.1 GMac Params: 0.97 M
     # SeparableXception os=8, attention=True  FLOPs: 5.31 GMac Params: 1.39 M
-    # NativeXception os=8, attention=False FLOPs: 13.1 GMac Params: 7.02 M
-    # NativeXception os=8, attention=True  FLOPs: 14.71 GMac Params: 10.64 M
+    # NativeXception os=8, attention=False FLOPs: 34.57 GMac Params: 7.02 M
+    # NativeXception os=8, no channel attention FLOPs: 36.18 GMac Params: 10.57 M
+    # NativeXception os=8, no spatial attention FLOPs: 34.57 GMac Params: 7.09 M
+    # NativeXception os=8, attention=True  FLOPs: 36.18 GMac Params: 10.64 M

@@ -30,7 +30,7 @@ class Trainer(object):
         self.saver = Saver(args)
         self.saver.save_experiment_config()
         # Define Tensorboard Summary
-        self.writer = SummaryWriter(self.saver.experiment_dir, comment='LightXception')
+        self.writer = SummaryWriter(self.saver.experiment_dir, comment=args.backbone)
 
         # Define Dataloader
         kwargs = {'num_workers': args.workers, 'pin_memory': True}
