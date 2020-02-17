@@ -43,14 +43,14 @@ class Trainer(object):
                             use_attention=args.use_attention,
                             backbone=args.backbone,
                             use_channel_shuffle=args.use_channel_shuffle,
-                            pretrained=args.pretrianed,
-                            pretrain_file=args.pretrian_file
+                            pretrained=args.pretrained,
+                            pretrain_file=args.pretrain_file
                             )
 
         # Define Optimizer
-        if args.pretrianed:
-            train_params = [{'params': model.get_1x_lr_params()},
-                            {'params': model.get_10x_lr_params(), 'lr': self.args.lr * 10}]
+        if args.pretrained:
+            train_params = [{'params': self.model.get_1x_lr_params()},
+                            {'params': self.model.get_10x_lr_params(), 'lr': self.args.lr * 10}]
         else:
             train_params = [{'params': self.model.parameters()}]
 

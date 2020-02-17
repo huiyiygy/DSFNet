@@ -278,8 +278,8 @@ if __name__ == "__main__":
     print(low_level_feat.size())  # [1, 64, 128, 128]
 
     # Test Load pretrain model
-    # file = r'/home/lab/ygy/DSFNet/checkpoint/imagenet/01_54.468_with_ channel_ shuffle/pretrain_model_best.pth.tar'
-    # file = r'/home/lab/ygy/DSFNet/checkpoint/imagenet/02_59.002_without_ channel_ shuffle/pretrain_model_best.pth.tar'
+    # file = r'/home/lab/ygy/DSFNet/checkpoint/imagenet/01_54.468_with_channel_shuffle/pretrain_model_best.pth.tar'
+    # file = r'/home/lab/ygy/DSFNet/checkpoint/imagenet/02_59.002_without_channel_shuffle/pretrain_model_best.pth.tar'
     # model = LightXception(use_channel_shuffle=False, pretrained=True, pretrain_file=file)
 
     # visualize the architecture of LightXception

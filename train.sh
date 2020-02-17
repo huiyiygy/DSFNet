@@ -103,7 +103,7 @@
 # CUDA_VISIBLE_DEVICES=0 python train.py --backbone native_xception --lr 0.01 --use-attention --out-stride 8
 
 # experiment 35 pretrained attention DSFNet out-stride 8 lr 0.001 without channel shuffle
-CUDA_VISIBLE_DEVICES=0 python train.py --lr 0.001 --use-attention --out-stride 8 --pretrained --pretrain-file /home/lab/ygy/DSFNet/checkpoint/imagenet/02_59.002_without_ channel_ shuffle/pretrain_model_best.pth.tar
+CUDA_VISIBLE_DEVICES=0 python train.py --lr 0.001 --use-attention --out-stride 8 --pretrained --pretrain-file /home/lab/ygy/DSFNet/checkpoint/imagenet/02_59.002_without_channel_shuffle/pretrain_model_best.pth.tar
 
 # experiment 36 pretrained attention DSFNet out-stride 8 lr 0.001 with channel shuffle
-# CUDA_VISIBLE_DEVICES=0 python train.py --lr 0.001 --use-attention --use-channel-shuffle --out-stride 8 --pretrained --pretrain-file /home/lab/ygy/DSFNet/checkpoint/imagenet/01_54.468_with_ channel_ shuffle/pretrain_model_best.pth.tar
+# CUDA_VISIBLE_DEVICES=0 python train.py --lr 0.001 --use-attention --use-channel-shuffle --out-stride 8 --pretrained --pretrain-file /home/lab/ygy/DSFNet/checkpoint/imagenet/01_54.468_with_channel_shuffle/pretrain_model_best.pth.tar
