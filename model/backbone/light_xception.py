@@ -256,7 +256,18 @@ class LightXception(nn.Module):
         model_dict = {}
         state_dict = self.state_dict()
 
-        # TODO: Load pretrained model
+        for k, v in pretrain_dict.items():
+            if 'module.backbone.' in k:
+                model_dict[k.replace('module.backbone.', '')] = v
+
+        # To see what different between state_dict and model_dict
+        # for k, _ in model_dict.items():
+        #     if k in state_dict:
+        #         state_dict.pop(k)
+
+        state_dict.update(model_dict)
+        self.load_state_dict(state_dict)
+        print('Load pretrained model successful!')
 
 
 if __name__ == "__main__":
@@ -265,6 +276,11 @@ if __name__ == "__main__":
     output, low_level_feat = model(inputs)
     print(output.size())  # [1, 256, 64, 64]
     print(low_level_feat.size())  # [1, 64, 128, 128]
+
+    # Test Load pretrain model
+    # file = r'/home/lab/ygy/DSFNet/checkpoint/imagenet/01_54.468_with_ channel_ shuffle/pretrain_model_best.pth.tar'
+    # file = r'/home/lab/ygy/DSFNet/checkpoint/imagenet/02_59.002_without_ channel_ shuffle/pretrain_model_best.pth.tar'
+    # model = LightXception(use_channel_shuffle=False, pretrained=True, pretrain_file=file)
 
     # visualize the architecture of LightXception
     # from torch.utils.tensorboard import SummaryWriter
