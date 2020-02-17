@@ -48,11 +48,17 @@ class Trainer(object):
                             )
 
         # Define Optimizer
+        if args.pretrianed:
+            train_params = [{'params': model.get_1x_lr_params()},
+                            {'params': model.get_10x_lr_params(), 'lr': self.args.lr * 10}]
+        else:
+            train_params = [{'params': self.model.parameters()}]
+
         if self.args.optim == 'sgd':
-            self.optimizer = torch.optim.SGD(self.model.parameters(), lr=self.args.lr, momentum=args.momentum,
+            self.optimizer = torch.optim.SGD(train_params, lr=self.args.lr, momentum=args.momentum,
                                              weight_decay=args.weight_decay, nesterov=args.nesterov)
         elif self.args.optim == 'adam':
-            self.optimizer = torch.optim.Adam(self.model.parameters(), lr=self.args.lr, weight_decay=args.weight_decay)
+            self.optimizer = torch.optim.Adam(train_params, lr=self.args.lr, weight_decay=args.weight_decay)
         else:
             raise NotImplementedError
 
