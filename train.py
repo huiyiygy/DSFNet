@@ -49,10 +49,10 @@ class Trainer(object):
 
         # Define Optimizer
         if args.pretrained:
-            train_params = [{'params': self.model.get_1x_lr_params()},
-                            {'params': self.model.get_10x_lr_params(), 'lr': self.args.lr * 10}]
+            train_params = [{'params': self.model.get_1x_lr_params(), 'lr': self.args.lr},  # Encoder: pretrained backbone parameters
+                            {'params': self.model.get_10x_lr_params(), 'lr': self.args.lr * 10}]  # Decoder: untrained parameters, lr should x10
         else:
-            train_params = [{'params': self.model.parameters()}]
+            train_params = [{'params': self.model.parameters(), 'lr': self.args.lr}]
 
         if self.args.optim == 'sgd':
             self.optimizer = torch.optim.SGD(train_params, lr=self.args.lr, momentum=args.momentum,
