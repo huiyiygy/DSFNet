@@ -64,7 +64,7 @@ class Trainer(object):
 
         # Define lr scheduler
         if self.args.lr_scheduler == 'plateau':
-            self.scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(self.optimizer,  mode='max', factor=0.3, verbose=True, min_lr=1e-10)
+            self.scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(self.optimizer,  mode='max', factor=0.3, verbose=True)
         elif self.args.lr_scheduler == 'step':
             self.scheduler = torch.optim.lr_scheduler.StepLR(self.optimizer, step_size=10, gamma=0.9)
         elif self.args.lr_scheduler == 'cos':
