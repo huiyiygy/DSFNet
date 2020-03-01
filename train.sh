@@ -107,3 +107,33 @@
 
 # experiment 36 pretrained attention DSFNet out-stride 8 lr 0.001 with channel shuffle
 # CUDA_VISIBLE_DEVICES=0 python train.py --lr 0.001 --use-attention --use-channel-shuffle --out-stride 8 --pretrained --pretrain-file /home/lab/ygy/DSFNet/checkpoint/imagenet/01_54.468_with_channel_shuffle/pretrain_model_best.pth.tar
+
+# same dilation rate means when os=8, light_xception.py will do following changes
+# middle_block_dilation [5, 7, 9] to [2, 2, 2]
+# exit_block_dilations = [2, 5, 7 9] to [2, 4, 4, 4]
+# experiment 37 attention DSFNet out-stride 8 lr 0.01  without channel shuffle Sanme dilation rate
+# CUDA_VISIBLE_DEVICES=0 python train.py --lr 0.01 --use-attention --out-stride 8
+
+# experiment 38 native DSFNet out-stride 8 lr 0.01  without channel shuffle Sanme dilation rate
+# CUDA_VISIBLE_DEVICES=0 python train.py --lr 0.01 --out-stride 8
+
+# experiment 39 attention NativeXception out-stride 8 lr 0.01 Sanme dilation rate
+# CUDA_VISIBLE_DEVICES=0 python train.py --backbone native_xception  --use-attention --lr 0.01 --out-stride 8
+
+# experiment 40 native SeparableXception out-stride 8 lr 0.01 Sanme dilation rate
+# CUDA_VISIBLE_DEVICES=0 python train.py --backbone separable_xception --lr 0.01 --out-stride 8
+
+# experiment 41 attention SeparableXception out-stride 8 lr 0.01 Sanme dilation rate
+# CUDA_VISIBLE_DEVICES=0 python train.py --backbone separable_xception --use-attention --lr 0.01 --out-stride 8
+
+# experiment 42 native SeparableXception out-stride 8 lr 0.01 without dilation
+# CUDA_VISIBLE_DEVICES=0 python train.py --backbone separable_xception --lr 0.01 --out-stride 8
+
+# experiment 43 native DSFNet out-stride 8 lr 0.01  without channel shuffle without dilation
+# CUDA_VISIBLE_DEVICES=0 python train.py --lr 0.01 --out-stride 8
+
+# experiment 44 native NativeXception out-stride 8 lr 0.01 without dilation
+# CUDA_VISIBLE_DEVICES=0 python train.py --backbone native_xception --lr 0.01 --out-stride 8
+
+# experiment 45 native NativeXception out-stride 8 lr 0.01 Sanme dilation rate
+# CUDA_VISIBLE_DEVICES=0 python train.py --backbone native_xception --lr 0.01 --out-stride 8
