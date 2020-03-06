@@ -93,11 +93,11 @@ class Xception(nn.Module):
         if output_stride == 16:
             entry_block3_stride = 2
             middle_block_dilation = [1, 1, 1]
-            exit_block_dilations = [1, 5, 7, 9]
+            exit_block_dilations = [1, 2, 5, 1]  # To be Tested
         elif output_stride == 8:
             entry_block3_stride = 1
-            middle_block_dilation = [5, 7, 9]
-            exit_block_dilations = [2, 5, 7, 9]
+            middle_block_dilation = [1, 2, 5]
+            exit_block_dilations = [1, 2, 5, 1]
         else:
             raise NotImplementedError
 

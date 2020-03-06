@@ -102,11 +102,15 @@
 # experiment 34 attention NativeXception out-stride 8 lr 0.01 without channel attention
 # CUDA_VISIBLE_DEVICES=0 python train.py --backbone native_xception --lr 0.01 --use-attention --out-stride 8
 
+#######################################################################
+
 # experiment 35 pretrained attention DSFNet out-stride 8 lr 0.001 without channel shuffle
 # CUDA_VISIBLE_DEVICES=0 python train.py --lr 0.001 --use-attention --out-stride 8 --pretrained --pretrain-file /home/lab/ygy/DSFNet/checkpoint/imagenet/02_59.002_without_channel_shuffle/pretrain_model_best.pth.tar
 
 # experiment 36 pretrained attention DSFNet out-stride 8 lr 0.001 with channel shuffle
 # CUDA_VISIBLE_DEVICES=0 python train.py --lr 0.001 --use-attention --use-channel-shuffle --out-stride 8 --pretrained --pretrain-file /home/lab/ygy/DSFNet/checkpoint/imagenet/01_54.468_with_channel_shuffle/pretrain_model_best.pth.tar
+
+#######################################################################
 
 # same dilation rate means when os=8, light_xception.py will do following changes
 # middle_block_dilation [5, 7, 9] to [2, 2, 2]
@@ -137,3 +141,26 @@
 
 # experiment 45 native NativeXception out-stride 8 lr 0.01 Sanme dilation rate
 # CUDA_VISIBLE_DEVICES=0 python train.py --backbone native_xception --lr 0.01 --out-stride 8
+
+#######################################################################
+
+# Hybrid Dialation Convolution HDC
+# middle_block_dilation [5, 7, 9] to [1, 2, 5]
+# exit_block_dilations = [2, 5, 7 9] to [1, 2, 5, 1]
+# experiment 46 native DSFNet out-stride 8 lr 0.01  without channel shuffle Hybrid dilation
+# CUDA_VISIBLE_DEVICES=0 python train.py --lr 0.01 --out-stride 8
+
+# experiment 47 native SeparableXception out-stride 8 lr 0.01 Hybrid dilation
+# CUDA_VISIBLE_DEVICES=0 python train.py --backbone separable_xception --lr 0.01 --out-stride 8
+
+# experiment 48 native NativeXception out-stride 8 lr 0.01 Hybrid dilation
+# CUDA_VISIBLE_DEVICES=0 python train.py --backbone native_xception --lr 0.01 --out-stride 8
+
+# experiment 49 attention DSFNet out-stride 8 lr 0.01  without channel shuffle Hybrid dilation
+# CUDA_VISIBLE_DEVICES=0 python train.py --use-attention --lr 0.01 --out-stride 8
+
+# experiment 50 attention SeparableXception out-stride 8 lr 0.01 Hybrid dilation
+# CUDA_VISIBLE_DEVICES=0 python train.py --backbone separable_xception --use-attention --lr 0.01 --out-stride 8
+
+# experiment 51 attention NativeXception out-stride 8 lr 0.01 Hybrid dilation
+# CUDA_VISIBLE_DEVICES=0 python train.py --backbone native_xception --use-attention --lr 0.01 --out-stride 8
