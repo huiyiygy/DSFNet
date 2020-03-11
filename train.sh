@@ -164,3 +164,21 @@
 
 # experiment 51 attention NativeXception out-stride 8 lr 0.01 Hybrid dilation
 # CUDA_VISIBLE_DEVICES=0 python train.py --backbone native_xception --use-attention --lr 0.01 --out-stride 8
+
+# experiment 52 attention DSFNet out-stride 8 lr 0.01  without channel shuffle Hybrid dilation without spatial attention
+# CUDA_VISIBLE_DEVICES=0 python train.py --use-attention --lr 0.01 --out-stride 8
+
+# experiment 53 attention DSFNet out-stride 8 lr 0.01  without channel shuffle Hybrid dilation without channel attention
+# CUDA_VISIBLE_DEVICES=0 python train.py --use-attention --lr 0.01 --out-stride 8
+
+# experiment 54 attention SeparableXception out-stride 8 lr 0.01 Hybrid dilation without channel attention
+# CUDA_VISIBLE_DEVICES=0 python train.py --backbone separable_xception --use-attention --lr 0.01 --out-stride 8
+
+# experiment 55 attention SeparableXception out-stride 8 lr 0.01 Hybrid dilation without spatial attention
+# CUDA_VISIBLE_DEVICES=0 python train.py --backbone separable_xception --use-attention --lr 0.01 --out-stride 8
+
+# experiment 56 attention NativeXception out-stride 8 lr 0.01 Hybrid dilation without spatial attention
+# CUDA_VISIBLE_DEVICES=0 python train.py --backbone native_xception --use-attention --lr 0.01 --out-stride 8
+
+# experiment 57 attention NativeXception out-stride 8 lr 0.01 Hybrid dilation without channel attention
+# CUDA_VISIBLE_DEVICES=0 python train.py --backbone native_xception --use-attention --lr 0.01 --out-stride 8

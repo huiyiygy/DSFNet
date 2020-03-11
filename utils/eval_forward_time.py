@@ -79,15 +79,21 @@ if __name__ == '__main__':
     # DSFNet os 8 with spatial attention with channel shuffle FPS:45
     # DSFNet os 8 with channel attention with channel shuffle FPS:46
     # DSFNet os 8 without attention with channel shuffle FPS:46
-    # DSFNet os 8 attention without channel shuffle FPS:58
-    # DSFNet os 8 no channel attention without channel shuffle FPS:58
-    # DSFNet os 8 no spatial attention without channel shuffle FPS:
-    # DSFNet os 8 without attention without channel shuffle FPS:62
-    # SeparableXception os 8 attention FPS:58
-    # SeparableXception os 8 no channel attention FPS:58
-    # SeparableXception os 8 no spatial attention FPS:61
-    # SeparableXception os 8 without attention FPS:59
-    # NativeXception os 8 attention FPS:43
-    # NativeXception os 8 no channel attention FPS:44
-    # NativeXception os 8 no spatial attention FPS:45
-    # NativeXception os 8 without attention FPS:45
+
+    # DSFNet os 8 attention without channel shuffle FPS:60
+    # DSFNet os 8 no channel attention without channel shuffle FPS:60
+    # DSFNet os 8 no spatial attention without channel shuffle FPS:60
+    # DSFNet os 8 without attention without channel shuffle FPS:61
+    # DSFNet os 8 without attention without channel shuffle without dilation FPS:62
+
+    # SeparableXception os 8 attention FPS:56
+    # SeparableXception os 8 no channel attention FPS:56
+    # SeparableXception os 8 no spatial attention FPS:58
+    # SeparableXception os 8 without attention FPS:58
+    # SeparableXception os 8 without attention without dilation FPS:58
+
+    # NativeXception os 8 attention FPS:50
+    # NativeXception os 8 no channel attention FPS:51
+    # NativeXception os 8 no spatial attention FPS:53
+    # NativeXception os 8 without attention FPS:53
+    # NativeXception os 8 without attention without dilation FPS:72
