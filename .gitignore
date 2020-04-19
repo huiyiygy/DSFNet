@@ -3,5 +3,4 @@
 __pycache__/
 
 .idea/
-/checkpoint/cityscapes
-/checkpoint/imagenet
+/checkpoint/*

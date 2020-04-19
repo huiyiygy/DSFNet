@@ -146,7 +146,7 @@
 
 # Hybrid Dialation Convolution HDC
 # middle_block_dilation [5, 7, 9] to [1, 2, 5]
-# exit_block_dilations = [2, 5, 7 9] to [1, 2, 5, 1]
+# exit_block_dilations = [2, 5, 7, 9] to [1, 2, 5, 1]
 # experiment 46 native DSFNet out-stride 8 lr 0.01  without channel shuffle Hybrid dilation
 # CUDA_VISIBLE_DEVICES=0 python train.py --lr 0.01 --out-stride 8
 
@@ -182,3 +182,6 @@
 
 # experiment 57 attention NativeXception out-stride 8 lr 0.01 Hybrid dilation without channel attention
 # CUDA_VISIBLE_DEVICES=0 python train.py --backbone native_xception --use-attention --lr 0.01 --out-stride 8
+
+# experiment 58 attention DSFNet batchsize 4 out-stride 8 lr 0.01  without channel shuffle Hybrid dilation
+CUDA_VISIBLE_DEVICES=0 python train.py --use-attention --lr 0.01 --out-stride 8  --batch-size 4
