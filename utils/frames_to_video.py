@@ -18,7 +18,7 @@ def write(images, fps=25, size=None, is_color=True, format="mp4V", video_name='d
     - fps: 视频帧率
     - size: 视频分辨率大小
     - is_color: 是否保存为彩色
-    - format: 'mp4V' for mp4, 'XVID' for avi
+    - format: 'mp4V' for mp4, 'XVID' or 'MJPG' or 'DVIX' for avi,
     - video_name: 视频保存路径
     """
     fourcc = VideoWriter_fourcc(*format)
