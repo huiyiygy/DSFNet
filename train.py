@@ -148,7 +148,7 @@ class Trainer(object):
         # Fast test during the training
         pixel_accuracy = self.evaluator.pixel_accuracy()
         mean_class_pixel_accuracy = self.evaluator.pixel_accuracy_class()
-        mIoU = self.evaluator.mean_intersection_over_union()
+        _, mIoU = self.evaluator.mean_intersection_over_union()
         FWIoU = self.evaluator.frequency_weighted_intersection_over_union()
         self.writer.add_scalar('train/mIoU', mIoU, epoch)
         self.writer.add_scalar('train/pixel_accuracy', pixel_accuracy, epoch)
@@ -191,7 +191,7 @@ class Trainer(object):
         # Fast test during the training
         pixel_accuracy = self.evaluator.pixel_accuracy()
         mean_class_pixel_accuracy = self.evaluator.pixel_accuracy_class()
-        mIoU = self.evaluator.mean_intersection_over_union()
+        per_class_iou, mIoU = self.evaluator.mean_intersection_over_union()
         FWIoU = self.evaluator.frequency_weighted_intersection_over_union()
         self.writer.add_scalar('val/total_loss_epoch', test_loss, epoch)
         self.writer.add_scalar('val/mIoU', mIoU, epoch)
@@ -211,11 +211,17 @@ class Trainer(object):
         if new_pred > self.best_pred:
             is_best = True
             self.best_pred = new_pred
+            class_names = ['road', 'sidewalk', 'building', 'wall', 'fence',
+                           'pole', 'traffic_light', 'traffic_sign', 'vegetation', 'terrain',
+                           'sky', 'person', 'rider', 'car', 'truck', 'bus', 'train',
+                           'motorcycle', 'bicycle']
+            per_class_iou = dict(zip(class_names, per_class_iou))
             self.saver.save_checkpoint({
                 'epoch': epoch + 1,
                 'state_dict': self.model.module.state_dict(),
                 'optimizer': self.optimizer.state_dict(),
                 'best_pred': self.best_pred,
+                'per_class_iou': per_class_iou,
             }, is_best)
 
 

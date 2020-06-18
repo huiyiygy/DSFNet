@@ -20,11 +20,11 @@ class Evaluator(object):
         return mpac
 
     def mean_intersection_over_union(self):
-        MIoU = np.diag(self.confusion_matrix) / (
+        per_class_iou = np.diag(self.confusion_matrix) / (
                     np.sum(self.confusion_matrix, axis=1) + np.sum(self.confusion_matrix, axis=0) -
                     np.diag(self.confusion_matrix))
-        MIoU = np.nanmean(MIoU)
-        return MIoU
+        MIoU = np.nanmean(per_class_iou)
+        return [per_class_iou, MIoU]
 
     def frequency_weighted_intersection_over_union(self):
         """

@@ -24,7 +24,7 @@ class Saver(object):
         if is_best:
             best_pred = state['best_pred']
             with open(os.path.join(self.experiment_dir, 'best_pred.txt'), 'w') as f:
-                f.write(str(best_pred))
+                f.write("best_pred:{}\nper_class_iou:\n{}".format(best_pred, state['per_class_iou']))
             if self.runs:
                 previous_miou = [0.0]
                 for run in self.runs:

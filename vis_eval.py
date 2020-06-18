@@ -94,12 +94,17 @@ def main(args):
 
     pixel_accuracy = evaluator.pixel_accuracy()
     mean_class_pixel_accuracy = evaluator.pixel_accuracy_class()
-    mIoU = evaluator.mean_intersection_over_union()
+    per_class_iou, mIoU = evaluator.mean_intersection_over_union()
     FWIoU = evaluator.frequency_weighted_intersection_over_union()
+    class_names = ['road', 'sidewalk', 'building', 'wall', 'fence',
+                   'pole', 'traffic_light', 'traffic_sign', 'vegetation', 'terrain',
+                   'sky', 'person', 'rider', 'car', 'truck', 'bus', 'train',
+                   'motorcycle', 'bicycle']
+    per_class_iou = dict(zip(class_names, per_class_iou))
     print('test Result:')
     print("pixel_acc:{}, mean_class_pixel_acc:{}, mIoU:{}, fwIoU: {}".format(pixel_accuracy, mean_class_pixel_accuracy, mIoU, FWIoU))
     with open(os.path.join(args.checkpoint_folder, 'val_set_mIOU.txt'), 'w') as f:
-        f.write("pixel_accuracy:{}\nmean_class_pixel_accuracy:{}\nmIoU:{}\nfwIoU: {}".format(pixel_accuracy, mean_class_pixel_accuracy, mIoU, FWIoU))
+        f.write("pixel_accuracy:{}\nmean_class_pixel_accuracy:{}\nmIoU:{}\nfwIoU:{}\nper_class_iou:\n{}".format(pixel_accuracy, mean_class_pixel_accuracy, mIoU, FWIoU, per_class_iou))
 
 
 if __name__ == '__main__':
@@ -113,7 +118,8 @@ if __name__ == '__main__':
     parser.add_argument('--use-attention', action='store_true', default=False)
     parser.add_argument('--use-channel-shuffle', action='store_true', default=False,
                         help='Only for light_xception, whether to use channel shuffle in DSFNet (default: False)')
-    parser.add_argument('--is-vis', action='store_true', default=False)
+    parser.add_argument('--is-vis', action='store_true', default=False,
+                        help='whether to save predicted result (default: False)')
     parser.add_argument('--checkpoint-folder', type=str, default=None,
                         help='put the path to checkpoint folder')
 
