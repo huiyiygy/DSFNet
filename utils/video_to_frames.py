@@ -10,7 +10,7 @@ import argparse
 import numpy as np
 
 
-def video2frames(path, output_dir=None, skip=1, mirror=False):
+def video2frames(path, output_dir=None, skip=1, mirror=False, updown=False):
     """
     Inputs:
     -------
@@ -18,6 +18,7 @@ def video2frames(path, output_dir=None, skip=1, mirror=False):
     - output_dir: 图片保存目录
     - skip: 间隔多少帧保存一张图片
     - mirror: 是否水平翻转图片
+    - updown: 是否上下翻转图片
     """
     video_object = cv2.VideoCapture(path)
 
@@ -36,12 +37,15 @@ def video2frames(path, output_dir=None, skip=1, mirror=False):
             os.mkdir(output_dir)
 
     index = 0
+    # while index < 500:
     while video_object.isOpened():
         success, frame = video_object.read()
         if success:  # 是否读取成功
             if index % skip == 0:  # 间隔多少帧保存
                 if mirror:  # 是否水平翻转图片
                     frame = np.fliplr(frame)
+                if updown:
+                    frame = np.flipud(frame)
                 cv2.imwrite("{}/{:05d}.jpg".format(output_dir, index), frame)
         else:
             raise IOError("Reading video file Error!")
@@ -51,19 +55,20 @@ def video2frames(path, output_dir=None, skip=1, mirror=False):
 
 def main():
     parser = argparse.ArgumentParser("Enter the filename of a video")
-    parser.add_argument('--filename', type=str, default=r'D:\EP01.mp4')
+    parser.add_argument('--filename', type=str, default=r'D:\VID_20200702_162903.mp4')
     parser.add_argument('-o', '--output_dir', type=str, default=None)
     parser.add_argument('--skip', type=int, default=1, help="Only save every n th frame")
-    parser.add_argument('--mirror', action='store_true', default=False, help="Flip every other image")
+    parser.add_argument('--mirror', action='store_true', default=False, help="Flip every other image left and right")
+    parser.add_argument('--updown', action='store_true', default=False, help="Flip every other image up and down")
     args = parser.parse_args()
 
     # In case the filename points to a directory
     if os.path.isdir(args.filename):
         files = [os.path.join(args.filename, f) for f in os.listdir(args.filename) if os.path.isfile(os.path.join(args.filename, f))]
         for video in files:
-            video2frames(video, output_dir=args.output_dir, skip=args.skip, mirror=args.mirror)
+            video2frames(video, output_dir=args.output_dir, skip=args.skip, mirror=args.mirror, updown=args.updown)
     else:
-        video2frames(args.filename, output_dir=args.output_dir, skip=args.skip, mirror=args.mirror)
+        video2frames(args.filename, output_dir=args.output_dir, skip=args.skip, mirror=args.mirror, updown=args.updown)
 
 
 if __name__ == "__main__":

@@ -27,6 +27,8 @@ def write(images, fps=25, size=None, is_color=True, format="mp4V", video_name='d
     for image in tbar:
         if image.split('.')[-1] != 'jpg':
             continue
+        if 'image' in image:
+            continue
         img = imread(image)
         if vid is None:
             if size is None:
@@ -51,9 +53,9 @@ def jpg2video(images_dir, out_dir, fps, out_size):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--images_dir', type=str, default=r'D:\EP01_images')
+    parser.add_argument('--images_dir', type=str, default=r'D:\15_video_frames_mix')
     parser.add_argument('--out_dir', type=str, default=None)
-    parser.add_argument('--fps', type=int, default=30)
+    parser.add_argument('--fps', type=int, default=25)
     parser.add_argument('--out_width', type=int, default=1920)
     parser.add_argument('--out_height', type=int, default=1080)
     args = parser.parse_args()

@@ -117,7 +117,7 @@ def vis(args):
 
 if __name__ == '__main__':
     parser = ArgumentParser()
-    parser.add_argument('--backbone', type=str, default='separable_xception',
+    parser.add_argument('--backbone', type=str, default='light_xception',
                         choices=['separable_xception', 'light_xception', 'native_xception'], help='backbone name (default: light_xception)')
     parser.add_argument('--out-stride', type=int, default=8)
     parser.add_argument('--batch-size', type=int, default=4)
@@ -125,9 +125,9 @@ if __name__ == '__main__':
     parser.add_argument('--use-attention', action='store_true', default=True)
     parser.add_argument('--use-channel-shuffle', action='store_true', default=False,
                         help='Only for light_xception, whether to use channel shuffle in DSFNet (default: False)')
-    parser.add_argument('--checkpoint-dir', type=str, default='D:/liuxiaoyu/50_separable_xception',
+    parser.add_argument('--checkpoint-dir', type=str, default='D:/49_light_xception',
                         help='put the path to checkpoint folder')
-    parser.add_argument('--images-dir', type=str, default='D:/liuxiaoyu/15_video_frames',
+    parser.add_argument('--images-dir', type=str, default='D:/VID_20200702_162903',
                         help='put the path to images folder')
     parser.add_argument('--output-dir', type=str, default=None,
                         help='images predict results folder. if None, the directory will be --images-dir+_predict')
