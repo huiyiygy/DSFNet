@@ -184,4 +184,33 @@
 # CUDA_VISIBLE_DEVICES=0 python train.py --backbone native_xception --use-attention --lr 0.01 --out-stride 8
 
 # experiment 58 attention DSFNet batchsize 4 out-stride 8 lr 0.01  without channel shuffle Hybrid dilation
-CUDA_VISIBLE_DEVICES=0 python train.py --use-attention --lr 0.01 --out-stride 8  --batch-size 4
+# CUDA_VISIBLE_DEVICES=0 python train.py --use-attention --lr 0.01 --out-stride 8  --batch-size 4
+
+#######################################################################
+
+# experiment 59 big native DSFNet batchsize 2 out-stride 8 lr 0.01  without channel shuffle Hybrid dilation
+# CUDA_VISIBLE_DEVICES=0 python train.py --lr 0.01 --out-stride 8  --batch-size 2
+
+# experiment 60 big native DSFNet batchsize 2 out-stride 8 lr 0.01  without channel shuffle without dilation
+# CUDA_VISIBLE_DEVICES=0 python train.py --lr 0.01 --out-stride 8  --batch-size 2
+
+# experiment 61 native DSFNet batchsize 2 out-stride 8 lr 0.01  without channel shuffle without dilation
+# CUDA_VISIBLE_DEVICES=0 python train.py --lr 0.01 --out-stride 8  --batch-size 2
+
+# experiment 62 native SeparableXception out-stride 8 lr 0.01 without dilation
+# CUDA_VISIBLE_DEVICES=0 python train.py --backbone separable_xception --batch-size 2 --lr 0.01 --out-stride 8
+
+# experiment 63 big native SeparableXception out-stride 8 lr 0.01 Hybrid dilation
+# CUDA_VISIBLE_DEVICES=1 python train.py --backbone separable_xception --batch-size 2 --lr 0.01 --out-stride 8 --weight-decay 1e-7
+
+# experiment 64 big native SeparableXception out-stride 8 lr 0.01 without dilation
+# CUDA_VISIBLE_DEVICES=0 python train.py --backbone separable_xception --batch-size 2 --lr 0.01 --out-stride 8 --weight-decay 1e-7
+
+# experiment 65 big native NativeXception batchsize 2 out-stride 8 lr 0.01 Hybrid dilation
+# CUDA_VISIBLE_DEVICES=0 python train.py --backbone native_xception --batch-size 2 --lr 0.01 --out-stride 8
+
+# experiment 66 big native NativeXception batchsize 2 out-stride 8 lr 0.01 without dilation
+# CUDA_VISIBLE_DEVICES=0 python train.py --backbone native_xception --batch-size 2 --lr 0.01 --out-stride 8
+
+# experiment 67 native NativeXception batchsize 2 out-stride 8 lr 0.01 Hybrid dilation
+# CUDA_VISIBLE_DEVICES=0 python train.py --backbone native_xception --batch-size 2 --lr 0.01 --out-stride 8
